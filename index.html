@@ -1,0 +1,1701 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Interactive flashcards for 143 system design concepts and patterns, grouped by domain, with learning resources.">
+<title>System Design Atlas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Inter+Tight:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a sticky top bar, a breadcrumb toolbar, then one view at a time —
+   either a 3D "hash ring" shelf of cards, or a concept detail page. */
+:root {
+  --bg: #F3F5F8;
+  --bg-glow: rgba(53, 82, 214, .08);
+  --surface: #FFFFFF;
+  --surface-2: #F7F9FC;
+  --ink: #0D1220;
+  --ink-2: #485267;
+  --ink-3: #7A8497;
+  --line: #E0E5EC;
+  --line-2: #CBD2DD;
+  --accent: #3552D6;
+  --accent-ink: #FFFFFF;
+  --accent-soft: rgba(53, 82, 214, .10);
+  --good: #12804A;
+  --good-soft: rgba(18, 128, 74, .12);
+  --star: #A86A12;
+  --star-soft: rgba(168, 106, 18, .12);
+  --scrim: rgba(13, 18, 32, .38);
+  --shadow: 0 1px 2px rgba(13, 18, 32, .05), 0 14px 34px -16px rgba(13, 18, 32, .22);
+  --shadow-front: 0 2px 6px rgba(13, 18, 32, .06), 0 34px 70px -28px rgba(30, 48, 140, .45);
+  --floor: rgba(53, 82, 214, .13);
+  --dom-s: 62%;
+  --dom-l: 42%;
+  --font-display: "Inter Tight", "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-body: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --ease: cubic-bezier(.22, .8, .24, 1);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #090C11;
+    --bg-glow: rgba(125, 152, 255, .10);
+    --surface: #11161F;
+    --surface-2: #161C27;
+    --ink: #E8ECF3;
+    --ink-2: #A6B0C0;
+    --ink-3: #6F798B;
+    --line: #1E2531;
+    --line-2: #2B3443;
+    --accent: #84A0FF;
+    --accent-ink: #0A0D12;
+    --accent-soft: rgba(132, 160, 255, .14);
+    --good: #3FCF88;
+    --good-soft: rgba(63, 207, 136, .14);
+    --star: #F2B648;
+    --star-soft: rgba(242, 182, 72, .14);
+    --scrim: rgba(3, 5, 9, .62);
+    --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 18px 40px -18px rgba(0, 0, 0, .7);
+    --shadow-front: 0 2px 6px rgba(0, 0, 0, .4), 0 40px 80px -30px rgba(70, 100, 255, .38);
+    --floor: rgba(132, 160, 255, .14);
+    --dom-s: 80%;
+    --dom-l: 70%;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #090C11;
+  --bg-glow: rgba(125, 152, 255, .10);
+  --surface: #11161F;
+  --surface-2: #161C27;
+  --ink: #E8ECF3;
+  --ink-2: #A6B0C0;
+  --ink-3: #6F798B;
+  --line: #1E2531;
+  --line-2: #2B3443;
+  --accent: #84A0FF;
+  --accent-ink: #0A0D12;
+  --accent-soft: rgba(132, 160, 255, .14);
+  --good: #3FCF88;
+  --good-soft: rgba(63, 207, 136, .14);
+  --star: #F2B648;
+  --star-soft: rgba(242, 182, 72, .14);
+  --scrim: rgba(3, 5, 9, .62);
+  --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 18px 40px -18px rgba(0, 0, 0, .7);
+  --shadow-front: 0 2px 6px rgba(0, 0, 0, .4), 0 40px 80px -30px rgba(70, 100, 255, .38);
+  --floor: rgba(132, 160, 255, .14);
+  --dom-s: 80%;
+  --dom-l: 70%;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { height: 100%; }
+body {
+  background: radial-gradient(1100px 520px at 50% -12%, var(--bg-glow), transparent 62%), var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  overflow-x: hidden;
+}
+body::before {
+  content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px);
+  z-index: 10; background: var(--bg);
+}
+button { font: inherit; color: inherit; }
+a { color: var(--accent); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 8px; }
+
+.dom { --c: hsl(var(--h) var(--dom-s) var(--dom-l)); --c-soft: hsl(var(--h) var(--dom-s) var(--dom-l) / .12); --c-line: hsl(var(--h) var(--dom-s) var(--dom-l) / .45); }
+
+.shell { max-width: 1180px; margin: 0 auto; display: flex; flex-direction: column; min-height: 100%; }
+
+/* Top bar */
+.topbar {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20;
+  display: flex; align-items: center; gap: 16px;
+  padding-block: 14px;
+  background: var(--bg);
+  border-bottom: 1px solid var(--line);
+}
+.brand { display: flex; align-items: center; gap: 10px; min-width: 0; text-decoration: none; color: var(--ink); background: none; border: 0; cursor: pointer; padding: 0; }
+.brand-mark { width: 30px; height: 30px; flex: none; color: var(--accent); }
+.brand-name { font-family: var(--font-display); font-weight: 650; font-size: 17px; letter-spacing: -.01em; white-space: nowrap; }
+.brand-sub { font-family: var(--font-mono); font-size: 11.5px; color: var(--ink-3); white-space: nowrap; }
+.topbar-spacer { flex: 1; }
+.search-btn {
+  display: flex; align-items: center; gap: 10px;
+  height: 38px; padding: 0 10px 0 12px; min-width: 0;
+  border: 1px solid var(--line); background: var(--surface); border-radius: 10px;
+  color: var(--ink-3); cursor: pointer; width: 280px; max-width: 100%;
+  transition: border-color .15s, box-shadow .15s;
+}
+.search-btn:hover { border-color: var(--line-2); }
+.search-btn svg { width: 16px; height: 16px; flex: none; }
+.search-btn span { flex: 1; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 14px; }
+.kbd { font-family: var(--font-mono); font-size: 11px; color: var(--ink-3); border: 1px solid var(--line); border-radius: 6px; padding: 1px 6px; background: var(--surface-2); }
+.progress-pill { display: flex; align-items: center; gap: 10px; height: 38px; padding: 0 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); white-space: nowrap; }
+.progress-pill .num { font-family: var(--font-mono); font-size: 12.5px; font-variant-numeric: tabular-nums; color: var(--ink); }
+.progress-pill .lbl { font-size: 12.5px; color: var(--ink-3); }
+.mini-bar { width: 64px; height: 4px; border-radius: 4px; background: var(--line); overflow: hidden; }
+.mini-bar i { display: block; height: 100%; background: var(--good); border-radius: 4px; transition: width .4s var(--ease); }
+
+/* Toolbar */
+.toolbar { display: flex; align-items: center; gap: 12px; padding-block: 14px 4px; flex-wrap: wrap; }
+.back-btn {
+  display: inline-flex; align-items: center; gap: 6px; height: 34px; padding: 0 12px 0 8px;
+  border-radius: 9px; border: 1px solid var(--line); background: var(--surface); cursor: pointer;
+  font-size: 13.5px; font-weight: 500; color: var(--ink);
+  transition: border-color .15s, background .15s, opacity .15s;
+}
+.back-btn:hover:not(:disabled) { border-color: var(--line-2); background: var(--surface-2); }
+.back-btn:disabled { opacity: .45; cursor: default; }
+.back-btn svg { width: 18px; height: 18px; }
+.crumbs { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; min-width: 0; flex: 1; font-size: 13.5px; }
+.crumb { background: none; border: 0; padding: 4px 6px; border-radius: 6px; color: var(--ink-3); cursor: pointer; white-space: nowrap; }
+.crumb:hover { color: var(--ink); background: var(--accent-soft); }
+.crumb[aria-current="page"] { color: var(--ink); font-weight: 500; cursor: default; background: none; }
+.crumb-sep { color: var(--line-2); font-size: 12px; }
+.seg { display: inline-flex; padding: 3px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); }
+.seg button { border: 0; background: none; padding: 5px 12px; border-radius: 7px; font-size: 13px; color: var(--ink-3); cursor: pointer; font-weight: 500; }
+.seg button[aria-pressed="true"] { background: var(--accent-soft); color: var(--ink); }
+.seg .star-ic { color: var(--star); }
+
+/* Views and transitions */
+.view { flex: 1; padding-block: 8px 40px; }
+.view.leave-in { animation: leaveIn .2s ease forwards; }
+.view.leave-out { animation: leaveOut .2s ease forwards; }
+.view.enter-in { animation: enterIn .42s var(--ease); }
+.view.enter-out { animation: enterOut .42s var(--ease); }
+@keyframes leaveIn { to { opacity: 0; transform: scale(.955); } }
+@keyframes leaveOut { to { opacity: 0; transform: scale(1.025); } }
+@keyframes enterIn { from { opacity: 0; transform: scale(1.035) translateY(6px); } to { opacity: 1; transform: none; } }
+@keyframes enterOut { from { opacity: 0; transform: scale(.97); } to { opacity: 1; transform: none; } }
+
+/* Level header */
+.level-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; padding-block: 18px 6px; flex-wrap: wrap; }
+.level-head > div { min-width: 0; }
+.eyebrow { font-family: var(--font-mono); font-size: 11.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--c, var(--accent)); }
+.level-title { font-family: var(--font-display); font-weight: 650; font-size: clamp(28px, 4vw, 40px); letter-spacing: -.02em; line-height: 1.1; margin: 6px 0 8px; text-wrap: balance; }
+.level-blurb { color: var(--ink-2); max-width: 62ch; margin: 0; }
+.level-stats { display: flex; gap: 22px; }
+.stat { display: flex; flex-direction: column; gap: 2px; }
+.stat b { font-family: var(--font-display); font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums; letter-spacing: -.01em; }
+.stat span { font-size: 12px; color: var(--ink-3); text-transform: uppercase; letter-spacing: .06em; }
+
+/* Stage: rotating shelf */
+.stage {
+  --cw: 252px; --ch: 340px;
+  position: relative; height: 470px; margin-top: 8px;
+  perspective: 1700px; perspective-origin: 50% 38%;
+  touch-action: pan-y; user-select: none; -webkit-user-select: none;
+  overflow: hidden;
+}
+.stage::after {
+  content: ""; position: absolute; left: 50%; bottom: 26px; width: min(900px, 96%); height: 90px;
+  transform: translateX(-50%);
+  background: radial-gradient(closest-side, var(--floor), transparent);
+  pointer-events: none;
+}
+.ring { position: absolute; inset: 0; transform-style: preserve-3d; }
+.ring.dragging .card { transition: none; }
+.card {
+  position: absolute; left: 50%; top: 46%;
+  width: var(--cw); height: var(--ch);
+  margin: 0; padding: 20px;
+  display: flex; flex-direction: column; gap: 12px; text-align: left;
+  background: var(--surface); color: var(--ink);
+  border: 1px solid var(--line); border-radius: 18px;
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  transition: transform .72s var(--ease), opacity .5s ease, border-color .3s, box-shadow .3s;
+  backface-visibility: hidden; -webkit-backface-visibility: hidden;
+  will-change: transform;
+}
+.card.is-front { border-color: var(--c-line); box-shadow: var(--shadow-front); }
+.card:hover { border-color: var(--c-line); }
+.card-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 26px; }
+.tile { width: 40px; height: 40px; border-radius: 11px; display: grid; place-items: center; background: var(--c-soft); color: var(--c); }
+.tile svg { width: 22px; height: 22px; }
+.kicker { font-family: var(--font-mono); font-size: 11px; letter-spacing: .07em; text-transform: uppercase; color: var(--ink-3); }
+.card-title { font-family: var(--font-display); font-weight: 650; font-size: 22px; line-height: 1.15; letter-spacing: -.015em; margin: 4px 0 0; text-wrap: balance; }
+.card-blurb { margin: 0; color: var(--ink-2); font-size: 13.5px; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; flex: 0 1 auto; min-height: 0; }
+.card > * { flex-shrink: 0; }
+.card > .card-blurb { flex-shrink: 1; }
+.card-foot { margin-top: auto; display: flex; flex-direction: column; gap: 8px; }
+.card-meta { font-size: 12.5px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+.bar { height: 4px; border-radius: 4px; background: var(--line); overflow: hidden; }
+.bar i { display: block; height: 100%; background: var(--good); border-radius: 4px; }
+.card-cta { display: flex; align-items: center; justify-content: space-between; font-size: 12.5px; color: var(--ink-3); }
+.card.is-front .card-cta { color: var(--c); font-weight: 500; }
+.card-when { border-top: 1px dashed var(--line-2); padding-top: 10px; }
+.card-when .label, .label { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); }
+.card-when p { margin: 4px 0 0; font-size: 13px; color: var(--ink-2); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.chip { display: inline-flex; align-items: center; gap: 5px; height: 24px; padding: 0 9px; border-radius: 999px; font-size: 12px; font-weight: 500; white-space: nowrap; }
+.chip.star { background: var(--star-soft); color: var(--star); }
+.chip.learned { background: var(--good-soft); color: var(--good); }
+.chip.dom-chip { background: var(--c-soft); color: var(--c); }
+.chip svg { width: 13px; height: 13px; }
+
+.nav-arrow {
+  position: absolute; top: 46%; transform: translateY(-50%); z-index: 200;
+  width: 44px; height: 44px; border-radius: 50%;
+  display: grid; place-items: center; cursor: pointer;
+  background: var(--surface); border: 1px solid var(--line); color: var(--ink);
+  box-shadow: var(--shadow); transition: border-color .15s, opacity .15s;
+}
+.nav-arrow:hover:not(:disabled) { border-color: var(--line-2); }
+.nav-arrow:disabled { opacity: .35; cursor: default; }
+.nav-arrow svg { width: 20px; height: 20px; }
+.nav-arrow.prev { left: 4px; }
+.nav-arrow.next { right: 4px; }
+
+.ring-index { display: flex; flex-direction: column; align-items: center; gap: 10px; margin-top: -6px; }
+.ticks { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; max-width: 100%; }
+.tick { width: 22px; height: 6px; border-radius: 6px; border: 0; padding: 0; background: var(--line-2); cursor: pointer; transition: background .25s, width .25s; }
+.tick[aria-current="true"] { background: var(--c, var(--accent)); width: 34px; }
+.ring-row { display: flex; align-items: center; justify-content: center; gap: 14px; flex-wrap: wrap; }
+.ring-caption { font-size: 13px; color: var(--ink-3); text-align: center; }
+.auto-btn {
+  display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 11px 0 9px;
+  border-radius: 999px; border: 1px solid var(--line); background: var(--surface);
+  font-size: 12.5px; color: var(--ink-2); cursor: pointer; transition: border-color .15s, color .15s;
+}
+.auto-btn:hover { border-color: var(--line-2); color: var(--ink); }
+.auto-btn svg { width: 13px; height: 13px; }
+.auto-btn.is-on svg { color: var(--c, var(--accent)); }
+.ring-caption b { color: var(--ink); font-weight: 500; }
+.ring-caption .pos { font-family: var(--font-mono); font-variant-numeric: tabular-nums; margin-right: 8px; }
+.hint { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; font-size: 12.5px; color: var(--ink-3); margin-top: 6px; }
+.hint .kbd { margin-right: 4px; }
+.empty { text-align: center; padding: 80px 16px; color: var(--ink-2); }
+.empty button { margin-top: 12px; }
+
+/* Detail page */
+.detail { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 40px; padding-top: 18px; align-items: start; }
+.detail-main { min-width: 0; }
+.detail-chips { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
+.detail-title { font-family: var(--font-display); font-weight: 650; font-size: clamp(32px, 5vw, 48px); line-height: 1.05; letter-spacing: -.025em; margin: 14px 0 14px; text-wrap: balance; }
+.lead { font-size: 19px; line-height: 1.5; color: var(--ink); max-width: 60ch; margin: 0 0 24px; text-wrap: pretty; }
+.callout { border: 1px solid var(--c-line); background: var(--c-soft); border-radius: 14px; padding: 16px 18px; max-width: 64ch; }
+.callout .label { color: var(--c); }
+.callout p { margin: 6px 0 0; font-size: 16px; color: var(--ink); }
+.section { margin-top: 28px; max-width: 64ch; }
+.section h2 { font-family: var(--font-display); font-size: 15px; font-weight: 600; letter-spacing: .01em; margin: 0 0 6px; color: var(--ink); }
+.section p { margin: 0; color: var(--ink-2); font-size: 15.5px; }
+.related { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+.rel {
+  border: 1px solid var(--line); background: var(--surface); border-radius: 999px;
+  padding: 6px 12px; font-size: 13px; cursor: pointer; color: var(--ink-2);
+  display: inline-flex; align-items: center; gap: 6px; transition: border-color .15s, color .15s;
+}
+.rel:hover { border-color: var(--c-line); color: var(--ink); }
+.rel .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--star); }
+.pager { display: flex; gap: 12px; margin-top: 36px; max-width: 64ch; }
+.pager button {
+  flex: 1; min-width: 0; text-align: left; border: 1px solid var(--line); background: var(--surface);
+  border-radius: 12px; padding: 12px 14px; cursor: pointer; transition: border-color .15s;
+}
+.pager button:hover:not(:disabled) { border-color: var(--line-2); }
+.pager button:disabled { opacity: .4; cursor: default; }
+.pager .next { text-align: right; }
+.pager .label { display: block; }
+.pager .name { display: block; font-weight: 500; font-size: 14px; color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-top: 2px; }
+
+.aside { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 84px); display: flex; flex-direction: column; gap: 16px; }
+.panel { border: 1px solid var(--line); background: var(--surface); border-radius: 16px; padding: 16px; box-shadow: var(--shadow); }
+.panel h3 { font-family: var(--font-display); font-size: 14px; font-weight: 600; margin: 0 0 4px; }
+.panel .sub { font-size: 12.5px; color: var(--ink-3); margin: 0 0 12px; }
+.learn-btn {
+  width: 100%; height: 42px; border-radius: 11px; cursor: pointer; font-weight: 600; font-size: 14px;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  border: 1px solid var(--accent); background: var(--accent); color: var(--accent-ink);
+  transition: filter .15s, background .15s, color .15s;
+}
+.learn-btn:hover { filter: brightness(1.06); }
+.learn-btn[aria-pressed="true"] { background: var(--good-soft); color: var(--good); border-color: transparent; }
+.learn-btn svg { width: 17px; height: 17px; }
+.res-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.res {
+  display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 10px;
+  padding: 9px 10px; border-radius: 10px; text-decoration: none; color: var(--ink);
+  transition: background .15s;
+}
+.res:hover { background: var(--surface-2); }
+.res-type { font-family: var(--font-mono); font-size: 10px; letter-spacing: .06em; text-transform: uppercase; padding: 3px 6px; border-radius: 6px; background: var(--surface-2); color: var(--ink-2); border: 1px solid var(--line); min-width: 54px; text-align: center; }
+.res-type.t-v { color: hsl(352 70% 50%); }
+.res-type.t-s { color: var(--ink-3); }
+.res-body { min-width: 0; }
+.res-title { display: block; font-size: 13.5px; font-weight: 500; line-height: 1.35; }
+.res-host { display: block; font-size: 11.5px; color: var(--ink-3); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.res svg { width: 14px; height: 14px; color: var(--ink-3); }
+.res-group { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); margin: 12px 10px 4px; }
+.note { font-size: 12px; color: var(--ink-3); margin: 10px 10px 0; }
+
+/* Search palette */
+.palette-wrap { position: fixed; inset: 0; z-index: 100; background: var(--scrim); display: flex; justify-content: center; align-items: flex-start; padding: calc(env(safe-area-inset-top, 0px) + 10vh) max(16px, env(safe-area-inset-right, 0px)) 16px max(16px, env(safe-area-inset-left, 0px)); }
+.palette { width: min(640px, 100%); background: var(--surface); border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow-front); overflow: hidden; animation: pop .18s var(--ease); }
+@keyframes pop { from { opacity: 0; transform: translateY(-6px) scale(.985); } }
+.palette-input { display: flex; align-items: center; gap: 10px; padding: 0 16px; border-bottom: 1px solid var(--line); }
+.palette-input svg { width: 18px; height: 18px; color: var(--ink-3); flex: none; }
+.palette-input input { flex: 1; min-width: 0; height: 54px; border: 0; outline: 0; background: none; font: inherit; font-size: 16px; color: var(--ink); }
+.palette-list { max-height: min(56vh, 460px); overflow-y: auto; padding: 6px; margin: 0; list-style: none; }
+.p-item { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 10px 12px; border-radius: 10px; cursor: pointer; }
+.p-item[aria-selected="true"] { background: var(--accent-soft); }
+.p-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--c); }
+.p-name { font-weight: 500; font-size: 14px; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.p-path { font-size: 12px; color: var(--ink-3); display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.p-kind { font-family: var(--font-mono); font-size: 10.5px; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-3); }
+.p-empty { padding: 28px 16px; text-align: center; color: var(--ink-3); font-size: 14px; }
+.palette-foot { display: flex; gap: 14px; padding: 10px 16px; border-top: 1px solid var(--line); font-size: 12px; color: var(--ink-3); flex-wrap: wrap; }
+
+.footer { border-top: 1px solid var(--line); padding-block: 16px 24px; font-size: 12.5px; color: var(--ink-3); display: flex; gap: 16px; justify-content: space-between; flex-wrap: wrap; }
+
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+@media (max-width: 860px) {
+  .detail { grid-template-columns: minmax(0, 1fr); gap: 28px; }
+  .aside { position: static; }
+  .progress-pill .lbl, .mini-bar { display: none; }
+  .search-btn { width: auto; flex: 1; }
+  .topbar-spacer { display: none; }
+}
+@media (max-width: 560px) {
+  .brand-sub, .search-btn .kbd, .search-btn span { display: none; }
+  .search-btn { flex: none; width: 38px; padding: 0; justify-content: center; margin-left: auto; }
+  .brand-name { font-size: 16px; }
+  .stage { --cw: 228px; --ch: 336px; height: 430px; }
+  .card { padding: 18px; gap: 10px; }
+  .card-title { font-size: 20px; }
+  .card-blurb { -webkit-line-clamp: 3; }
+  .level-stats { gap: 16px; }
+  .hint { display: none; }
+  .nav-arrow { width: 38px; height: 38px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .card, .view, .palette, .tick, .mini-bar i { transition: none !important; animation: none !important; }
+}
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <header class="topbar">
+    <button class="brand" id="brand" type="button" aria-label="System Design Atlas, go to all domains">
+      <svg class="brand-mark" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+        <circle cx="16" cy="16" r="11" stroke="currentColor" stroke-width="1.6" opacity=".45"/>
+        <circle cx="16" cy="5" r="2.6" fill="currentColor"/>
+        <circle cx="25.5" cy="10.5" r="2.6" fill="currentColor" opacity=".8"/>
+        <circle cx="25.5" cy="21.5" r="2.6" fill="currentColor" opacity=".6"/>
+        <circle cx="16" cy="27" r="2.6" fill="currentColor" opacity=".45"/>
+        <circle cx="6.5" cy="21.5" r="2.6" fill="currentColor" opacity=".3"/>
+        <circle cx="6.5" cy="10.5" r="2.6" fill="currentColor" opacity=".2"/>
+      </svg>
+      <span class="brand-name">System Design Atlas</span>
+      <span class="brand-sub" id="brandSub"></span>
+    </button>
+    <div class="topbar-spacer"></div>
+    <button class="search-btn" id="searchBtn" type="button" aria-label="Search concepts">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+      <span>Search concepts</span>
+      <span class="kbd">⌘K</span>
+    </button>
+    <div class="progress-pill" title="Concepts you have marked as learned">
+      <span class="num" id="progNum">0 / 0</span>
+      <span class="lbl">learned</span>
+      <span class="mini-bar"><i id="progBar" style="width:0%"></i></span>
+    </div>
+  </header>
+
+  <nav class="toolbar" aria-label="Location">
+    <button class="back-btn" id="backBtn" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+      Back
+    </button>
+    <div class="crumbs" id="crumbs"></div>
+    <div class="seg" role="group" aria-label="Which concepts to show">
+      <button type="button" id="segAll" aria-pressed="true">All</button>
+      <button type="button" id="segCore" aria-pressed="false"><span class="star-ic">★</span> Core only</button>
+    </div>
+  </nav>
+
+  <main class="view" id="view" tabindex="-1"></main>
+
+  <footer class="footer">
+    <span>Links labelled <b>Search</b> open a YouTube or Wikipedia search for the term. Learned progress is saved in this browser only.</span>
+    <span id="footCount"></span>
+  </footer>
+</div>
+
+<div class="sr-only" aria-live="polite" id="live"></div>
+
+<div class="palette-wrap" id="paletteWrap" hidden>
+  <div class="palette" role="dialog" aria-modal="true" aria-label="Search concepts">
+    <div class="palette-input">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+      <input id="paletteInput" type="text" placeholder="Search 143 concepts, groups and domains" autocomplete="off" spellcheck="false" aria-controls="paletteList">
+      <span class="kbd">Esc</span>
+    </div>
+    <ul class="palette-list" id="paletteList" role="listbox" aria-label="Results"></ul>
+    <div class="palette-foot"><span><span class="kbd">↑</span> <span class="kbd">↓</span> to move</span><span><span class="kbd">Enter</span> to open</span></div>
+  </div>
+</div>
+
+<script>
+(function () {
+"use strict";
+
+/* ---------- Learning resources (checked links) ---------- */
+const L = {
+  latnum: ["a", "Latency numbers every programmer should know", "https://gist.github.com/jboner/2841832"],
+  primer: ["d", "System Design Primer", "https://github.com/donnemartin/system-design-primer"],
+  hiIntro: ["a", "Hello Interview — System Design in a Hurry", "https://www.hellointerview.com/learn/system-design/in-a-hurry/introduction"],
+  hiPatterns: ["a", "Hello Interview — Common patterns", "https://www.hellointerview.com/learn/system-design/in-a-hurry/patterns"],
+  hi7: ["a", "The 7 must-know patterns for system design interviews", "https://hellointerview.substack.com/p/the-7-must-know-patterns-for-system"],
+  bbg: ["v", "ByteByteGo — YouTube channel", "https://www.youtube.com/@ByteByteGo"],
+  hn: ["v", "Hussein Nasser — YouTube channel", "https://www.youtube.com/@hnasr"],
+  arpit: ["v", "Arpit Bhayani — videos and notes", "https://arpitbhayani.me"],
+  arpitIso: ["v", "Arpit Bhayani — Read Uncommitted isolation level", "https://arpitbhayani.me/videos/read-uncommitted-isolation-level-mechanics-anomalies-trade-offs"],
+  arpitConc: ["v", "Arpit Bhayani — Concurrency and locking", "https://arpitbhayani.me/topics/concurrency"],
+  arpitBtree: ["v", "Arpit Bhayani — Why databases store data in B+ trees", "https://arpitbhayani.me/videos/why-databases-store-data-in-b-plus-trees"],
+  vlad: ["a", "Vlad Mihalcea — Beginner’s guide to isolation levels", "https://vladmihalcea.com/a-beginners-guide-to-transaction-isolation-levels-in-enterprise-java/"],
+  pgIso: ["d", "PostgreSQL — Transaction isolation", "https://www.postgresql.org/docs/current/transaction-iso.html"],
+  pgMvcc: ["d", "PostgreSQL — Concurrency control (MVCC)", "https://www.postgresql.org/docs/current/mvcc-intro.html"],
+  luke: ["a", "Use The Index, Luke — Anatomy of an index", "https://use-the-index-luke.com/sql/anatomy"],
+  cfDns: ["a", "Cloudflare — What is DNS?", "https://www.cloudflare.com/learning/dns/what-is-dns/"],
+  fccDns: ["a", "freeCodeCamp — How DNS works", "https://www.freecodecamp.org/news/how-dns-works-the-internets-address-book/"],
+  cfTcp: ["a", "Cloudflare — What is TCP/IP?", "https://www.cloudflare.com/learning/ddos/glossary/tcp-ip/"],
+  cfTls: ["a", "Cloudflare — What happens in a TLS handshake?", "https://www.cloudflare.com/learning/ssl/what-happens-in-a-tls-handshake/"],
+  httpsVid: ["v", "How does HTTPS work?", "https://www.youtube.com/watch?v=j9QmMEWmcfo"],
+  cfHttp3: ["a", "Cloudflare — What is HTTP/3?", "https://www.cloudflare.com/learning/performance/what-is-http3/"],
+  grpc: ["d", "gRPC — Introduction", "https://grpc.io/docs/what-is-grpc/introduction/"],
+  gql: ["d", "GraphQL — Learn", "https://graphql.org/learn/"],
+  mdnIdem: ["d", "MDN — Idempotent", "https://developer.mozilla.org/en-US/docs/Glossary/Idempotent"],
+  stripeIdem: ["a", "Stripe — Designing robust APIs with idempotency", "https://stripe.com/blog/idempotency"],
+  awsIdem: ["a", "Amazon Builders’ Library — Making retries safe with idempotent APIs", "https://aws.amazon.com/builders-library/making-retries-safe-with-idempotent-APIs/"],
+  mdnSse: ["d", "MDN — Server-sent events", "https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events"],
+  mdnWs: ["d", "MDN — The WebSocket API", "https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API"],
+  rtVid: ["v", "Real-time communication patterns for system design interviews", "https://www.youtube.com/watch?v=-3rFgUiKKG4"],
+  l4l7: ["v", "Layer 4 vs Layer 7 load balancer", "https://www.youtube.com/watch?v=O_DfHBPYLTA"],
+  igoLb: ["a", "IGotAnOffer — Load balancing for system design interviews", "https://igotanoffer.com/blogs/tech/load-balancing-system-design-interview"],
+  cfLb: ["a", "Cloudflare — What is load balancing?", "https://www.cloudflare.com/learning/performance/what-is-load-balancing/"],
+  cfProxy: ["a", "Cloudflare — What is a reverse proxy?", "https://www.cloudflare.com/learning/cdn/glossary/reverse-proxy/"],
+  msGateway: ["a", "microservices.io — API gateway pattern", "https://microservices.io/patterns/apigateway.html"],
+  azGw: ["d", "Azure Architecture Center — Gateway Routing pattern", "https://learn.microsoft.com/azure/architecture/patterns/gateway-routing"],
+  cfCdn: ["a", "Cloudflare — What is a CDN?", "https://www.cloudflare.com/learning/cdn/what-is-a-cdn/"],
+  azPatterns: ["d", "Azure Architecture Center — Cloud design patterns", "https://learn.microsoft.com/azure/architecture/patterns"],
+  azSharding: ["d", "Azure — Sharding pattern", "https://learn.microsoft.com/azure/architecture/patterns/sharding"],
+  dynamo: ["p", "Amazon’s Dynamo paper", "https://www.allthingsdistributed.com/2007/10/amazons_dynamo.html"],
+  chVid: ["v", "What is consistent hashing and where is it used?", "https://www.youtube.com/watch?v=zaRkONvyGr8"],
+  azCacheAside: ["d", "Azure — Cache-Aside pattern", "https://learn.microsoft.com/azure/architecture/patterns/cache-aside"],
+  jepsen: ["a", "Jepsen — Consistency models", "https://jepsen.io/consistency"],
+  kleppmann: ["v", "Martin Kleppmann — Distributed systems lectures", "https://www.cl.cam.ac.uk/teaching/2122/ConcDisSys/materials.html"],
+  raftViz: ["i", "The Secret Lives of Data — Raft, visualised", "https://thesecretlivesofdata.com/raft/"],
+  raft: ["p", "The Raft consensus algorithm", "https://raft.github.io/"],
+  awsLeader: ["a", "Amazon Builders’ Library — Leader election", "https://aws.amazon.com/builders-library/leader-election-in-distributed-systems/"],
+  azLeader: ["d", "Azure — Leader Election pattern", "https://learn.microsoft.com/azure/architecture/patterns/leader-election"],
+  kLock: ["a", "Martin Kleppmann — How to do distributed locking", "https://martin.kleppmann.com/2016/02/08/how-to-do-distributed-locking.html"],
+  eos: ["d", "Confluent — Processing guarantees (exactly-once)", "https://docs.confluent.io/platform/current/streams/concepts.html#processing-guarantees"],
+  kafka: ["d", "Apache Kafka documentation", "https://kafka.apache.org/documentation/"],
+  azPubSub: ["d", "Azure — Publisher-Subscriber pattern", "https://learn.microsoft.com/azure/architecture/patterns/publisher-subscriber"],
+  azQbll: ["d", "Azure — Queue-Based Load Leveling pattern", "https://learn.microsoft.com/azure/architecture/patterns/queue-based-load-leveling"],
+  azCompeting: ["d", "Azure — Competing Consumers pattern", "https://learn.microsoft.com/azure/architecture/patterns/competing-consumers"],
+  msOutbox: ["a", "microservices.io — Transactional outbox", "https://microservices.io/patterns/data/transactional-outbox.html"],
+  dualWrite: ["a", "Confluent — Understanding the dual-write problem", "https://www.confluent.io/blog/dual-write-problem/"],
+  dgOutbox: ["a", "DesignGurus — Transactional outbox pattern", "https://www.designgurus.io/blog/transactional-outbox-pattern"],
+  debezium: ["d", "Debezium — Change data capture", "https://debezium.io/"],
+  msSaga: ["a", "microservices.io — Saga pattern", "https://microservices.io/patterns/data/saga.html"],
+  azSaga: ["d", "Azure — Saga pattern", "https://learn.microsoft.com/azure/architecture/patterns/saga"],
+  sagaTalk: ["v", "Chris Richardson — Managing data consistency with sagas", "https://www.youtube.com/watch?v=7dy5WPSv2DQ"],
+  msPatVid: ["v", "Microservice patterns: SAGA, CQRS, event sourcing", "https://www.youtube.com/watch?v=VoY_cs7-04o"],
+  msIndex: ["a", "microservices.io — Pattern catalogue", "https://microservices.io/patterns/index.html"],
+  fowlerES: ["a", "Martin Fowler — Event sourcing", "https://martinfowler.com/eaaDev/EventSourcing.html"],
+  azES: ["d", "Azure — Event Sourcing pattern", "https://learn.microsoft.com/azure/architecture/patterns/event-sourcing"],
+  fowlerCqrs: ["a", "Martin Fowler — CQRS", "https://martinfowler.com/bliki/CQRS.html"],
+  azCqrs: ["d", "Azure — CQRS pattern", "https://learn.microsoft.com/azure/architecture/patterns/cqrs"],
+  azHealth: ["d", "Azure — Health Endpoint Monitoring pattern", "https://learn.microsoft.com/azure/architecture/patterns/health-endpoint-monitoring"],
+  awsRetry: ["a", "Amazon Builders’ Library — Timeouts, retries and backoff with jitter", "https://aws.amazon.com/builders-library/timeouts-retries-and-backoff-with-jitter/"],
+  azRetry: ["d", "Azure — Retry pattern", "https://learn.microsoft.com/azure/architecture/patterns/retry"],
+  fowlerCb: ["a", "Martin Fowler — Circuit breaker", "https://martinfowler.com/bliki/CircuitBreaker.html"],
+  azCb: ["d", "Azure — Circuit Breaker pattern", "https://learn.microsoft.com/azure/architecture/patterns/circuit-breaker"],
+  resVid: ["v", "Resiliency patterns: circuit breakers and CQRS", "https://www.youtube.com/watch?v=QYJGJpqx1EE"],
+  azBulkhead: ["d", "Azure — Bulkhead pattern", "https://learn.microsoft.com/azure/architecture/patterns/bulkhead"],
+  cfRate: ["a", "Cloudflare — What is rate limiting?", "https://www.cloudflare.com/learning/bots/what-is-rate-limiting/"],
+  azRate: ["d", "Azure — Rate Limiting pattern", "https://learn.microsoft.com/azure/architecture/patterns/rate-limiting-pattern"],
+  rlVid: ["v", "Design a distributed rate limiter — interview breakdown", "https://www.youtube.com/watch?v=MIJFyUPG4Z4"],
+  awsShed: ["a", "Amazon Builders’ Library — Using load shedding to avoid overload", "https://aws.amazon.com/builders-library/using-load-shedding-to-avoid-overload/"],
+  sreOverload: ["a", "Google SRE book — Handling overload", "https://sre.google/sre-book/handling-overload/"],
+  sreSlo: ["a", "Google SRE book — Service level objectives", "https://sre.google/sre-book/service-level-objectives/"],
+  sreRisk: ["a", "Google SRE book — Embracing risk", "https://sre.google/sre-book/embracing-risk/"],
+  sreMon: ["a", "Google SRE book — Monitoring distributed systems", "https://sre.google/sre-book/monitoring-distributed-systems/"],
+  sreToc: ["a", "Google SRE book — Table of contents", "https://sre.google/sre-book/table-of-contents/"],
+  awsLib: ["a", "Amazon Builders’ Library", "https://aws.amazon.com/builders-library/"],
+  fowlerCanary: ["a", "Martin Fowler — Canary release", "https://martinfowler.com/bliki/CanaryRelease.html"],
+  fowlerBg: ["a", "Martin Fowler — Blue-green deployment", "https://martinfowler.com/bliki/BlueGreenDeployment.html"],
+  fowlerFlags: ["a", "Martin Fowler — Feature toggles", "https://martinfowler.com/articles/feature-toggles.html"],
+  redisZset: ["d", "Redis — Sorted sets", "https://redis.io/docs/latest/develop/data-types/sorted-sets/"],
+  azMv: ["d", "Azure — Materialized View pattern", "https://learn.microsoft.com/azure/architecture/patterns/materialized-view"],
+  azValet: ["d", "Azure — Valet Key pattern", "https://learn.microsoft.com/azure/architecture/patterns/valet-key"],
+  mt: ["a", "Modern Treasury — Accounting for developers", "https://www.moderntreasury.com/accounting-for-developers"],
+  tap: ["p", "Taming Google-scale continuous testing", "https://research.google/pubs/taming-google-scale-continuous-testing/"],
+  topk: ["v", "Top-K system design interview breakdown", "https://www.youtube.com/watch?v=y-tA2NW4LNY"],
+  oauth: ["d", "OAuth 2.0", "https://oauth.net/2/"],
+  jwt: ["a", "jwt.io — Introduction to JSON Web Tokens", "https://jwt.io/introduction"],
+  cfMtls: ["a", "Cloudflare — What is mutual TLS?", "https://www.cloudflare.com/learning/access-management/what-is-mutual-tls/"],
+  owasp: ["d", "OWASP Top 10", "https://owasp.org/www-project-top-ten/"],
+  tail: ["p", "The Tail at Scale (Dean and Barroso)", "https://research.google/pubs/the-tail-at-scale/"],
+  msCb: ["a", "microservices.io — Circuit breaker", "https://microservices.io/patterns/reliability/circuit-breaker.html"]
+};
+
+/* ---------- Icons ---------- */
+const ICON = {
+  gauge: '<path d="M4.5 17a8 8 0 1 1 15 0"/><path d="M12 13l4-4"/><circle cx="12" cy="13.5" r="1.4" fill="currentColor"/>',
+  network: '<circle cx="5" cy="12" r="2.2"/><circle cx="19" cy="5.5" r="2.2"/><circle cx="19" cy="18.5" r="2.2"/><path d="M7 11l10-4.5M7 13l10 4.5M19 7.7v8.6"/>',
+  db: '<ellipse cx="12" cy="5.5" rx="7" ry="2.5"/><path d="M5 5.5v13c0 1.4 3.1 2.5 7 2.5s7-1.1 7-2.5v-13"/><path d="M5 12c0 1.4 3.1 2.5 7 2.5s7-1.1 7-2.5"/>',
+  bolt: '<path d="M13 2.5L5 13.5h6l-1 8 8-11h-6z"/>',
+  nodes: '<circle cx="12" cy="4.5" r="2.2"/><circle cx="4.5" cy="18" r="2.2"/><circle cx="19.5" cy="18" r="2.2"/><path d="M10.9 6.5l-5.3 9.5M13.1 6.5l5.3 9.5M6.7 18h10.6"/>',
+  queue: '<rect x="3" y="7" width="4" height="10" rx="1"/><rect x="9" y="7" width="4" height="10" rx="1"/><path d="M15.5 12H21M18.5 9l3 3-3 3"/>',
+  shield: '<path d="M12 3l7 3v5.5c0 4.4-3 8-7 9.5-4-1.5-7-5.1-7-9.5V6z"/><path d="M8.8 12.2l2.2 2.2 4.4-4.6"/>',
+  blocks: '<rect x="3.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.5"/><path d="M17 13.5v7M13.5 17h7"/>',
+  lock: '<rect x="4.5" y="10.5" width="15" height="10" rx="2"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/><circle cx="12" cy="15.5" r="1.4" fill="currentColor"/>'
+};
+const svg = (name, extra) => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"' + (extra || "") + '>' + ICON[name] + '</svg>';
+const ARROW_OUT = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8"/></svg>';
+const CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+
+/* ---------- Content ----------
+   Leaf fields: id, n name, s core, o one-liner, w when to say it, h how it works,
+   t trade-off, r resources, k Wikipedia title (optional). */
+const DATA = [
+{ id: "scale", n: "Scale & Performance", hue: 225, icon: "gauge",
+  b: "How fast a system responds, how much it can handle, and the first moves for growing it.",
+  r: [L.latnum, L.primer, L.bbg],
+  g: [
+  { id: "measuring", n: "Measuring performance", b: "The numbers you state in the first five minutes of any design.", c: [
+    { id: "latency", n: "Latency", s: 1, k: "Latency (engineering)", o: "Time for one request to complete.", w: "Setting response-time targets.",
+      h: "Measured end to end from the client, latency adds up network round trips, queueing and processing time. State it as a percentile, never as an average.",
+      t: "Lower latency usually costs more: caches, more replicas, and data placed closer to users.", r: [L.latnum] },
+    { id: "throughput", n: "Throughput", s: 1, k: "Network throughput", o: "Requests or data handled per unit of time (QPS, MB/s).", w: "Sizing the system.",
+      h: "Throughput is capped by the slowest stage of the pipeline. Little’s law ties it to latency: requests in flight = throughput × latency.",
+      t: "Batching raises throughput but adds latency to each item." },
+    { id: "percentiles", n: "p50 / p99 percentiles", s: 1, o: "The time under which 50% or 99% of requests finish. p99 is the tail.", w: "Stating latency targets: “p99 under 200 ms”.",
+      h: "Sort all request times; p99 is the value 99% of them stay under. Averages hide slow outliers, percentiles expose them.",
+      t: "Tracking high percentiles needs histograms or sketches rather than simple averages." },
+    { id: "tail-latency", n: "Tail latency", o: "The slowest few percent of requests, often caused by one slow dependency.", w: "A request fans out to many services and one slow call delays the whole response.",
+      h: "If one request calls 100 servers, even a 1% chance of a slow server per call means most requests hit at least one. Timeouts and hedged requests cut the tail.",
+      t: "Hedging sends extra requests, trading extra load for lower tail latency.", r: [L.tail] },
+    { id: "bottleneck", n: "Bottleneck", o: "The one component that limits the whole system.", w: "“At 10× load, the database becomes the bottleneck.”",
+      h: "Find it by measuring utilisation and queue length at each stage; the stage near 100% utilisation sets the ceiling. Improving anything else doesn’t help.",
+      t: "Removing one bottleneck moves the limit to the next component." }
+  ]},
+  { id: "scaling", n: "Scaling strategies", b: "The first moves when one machine is no longer enough.", c: [
+    { id: "vertical-horizontal", n: "Vertical vs horizontal scaling", s: 1, k: "Scalability", o: "A bigger machine vs more machines.", w: "The first scaling question in any design.",
+      h: "Vertical scaling is simple but hits a hardware ceiling and keeps a single point of failure. Horizontal scaling adds machines behind a load balancer and needs the work to be split.",
+      t: "Horizontal scaling is almost unlimited but brings distribution problems: coordination, consistency and partial failure." },
+    { id: "stateless", n: "Stateless service", s: 1, k: "Stateless protocol", o: "A service that keeps no client data between requests, so any instance can handle any request.", w: "Justifying a load balancer and autoscaling.",
+      h: "Session data moves to a shared store such as Redis or into a signed token. Instances can then be added, removed or replaced at any time.",
+      t: "The shared state store becomes the thing to scale and protect." },
+    { id: "read-write-heavy", n: "Read-heavy vs write-heavy", o: "Which side dominates the load.", w: "Choosing caching (read-heavy) or partitioning and queues (write-heavy).",
+      h: "Read-heavy systems scale with caches, replicas and CDNs. Write-heavy systems scale with sharding, batching, queues and write-optimised storage.",
+      t: "Optimising one side often costs the other: more indexes speed reads but slow writes." },
+    { id: "estimation", n: "Back-of-envelope estimation", o: "Rough maths for QPS, storage and bandwidth from stated assumptions.", w: "The first five minutes of every design.",
+      h: "Start from users and actions per day, divide by 86,400 seconds for average QPS, and multiply by a peak factor of 2–3×. Storage = items per day × size × retention.",
+      t: "Precision doesn’t matter; the order of magnitude decides the design.", r: [L.latnum] },
+    { id: "amdahl", n: "Amdahl’s law", k: "Amdahl's law", o: "Speed-up is limited by the part that can’t be parallelised.", w: "Explaining why adding workers stops helping.",
+      h: "If 10% of a job is serial, the maximum speed-up is 10×, however many machines you add.",
+      t: "Shrinking the serial part matters more than adding capacity." }
+  ]}
+  ]},
+
+{ id: "networking", n: "Networking & APIs", hue: 195, icon: "network",
+  b: "How clients reach services, how services talk to each other, and how traffic is spread.",
+  r: [L.hn, L.bbg, L.primer],
+  g: [
+  { id: "net-foundations", n: "Network foundations", b: "What happens between typing a URL and the first byte.", c: [
+    { id: "dns", n: "DNS", s: 1, k: "Domain Name System", o: "Turns a name into an IP address.", w: "Explaining how a client finds the service; geo-routing.",
+      h: "The resolver asks a root server, then the top-level domain server (.com), then the domain’s authoritative server, caching each answer for its TTL. DNS can return different IPs per region.",
+      t: "Long TTLs mean fewer lookups but slower failover to a new IP.", r: [L.cfDns, L.fccDns] },
+    { id: "tcp-udp", n: "TCP vs UDP", s: 1, k: "Transmission Control Protocol", o: "TCP is reliable and ordered; UDP sends packets with no guarantees.", w: "Video, gaming or voice (UDP) vs almost everything else (TCP).",
+      h: "TCP opens with a three-way handshake (SYN, SYN-ACK, ACK), numbers every byte and retransmits losses. UDP just sends datagrams; a lost packet is simply gone.",
+      t: "TCP’s reliability adds latency; UDP is faster but the application must cope with loss.", r: [L.cfTcp] },
+    { id: "tls", n: "TLS / HTTPS", s: 1, k: "Transport Layer Security", o: "Encryption plus proof of the server’s identity.", w: "Any public endpoint.",
+      h: "In the handshake the server presents a certificate signed by a trusted authority, and both sides agree on session keys. Everything afterwards is encrypted.",
+      t: "The handshake adds round trips; TLS 1.3 and session resumption reduce them.", r: [L.cfTls, L.httpsVid] },
+    { id: "http23", n: "HTTP/2 and HTTP/3", k: "HTTP/3", o: "HTTP/2 sends many requests over one connection; HTTP/3 runs over QUIC on UDP.", w: "Reducing connection overhead and head-of-line blocking.",
+      h: "HTTP/2 multiplexes streams over one TCP connection, but one lost packet stalls them all. HTTP/3 uses QUIC, where each stream recovers on its own and the handshake is faster.",
+      t: "Some networks block UDP, so clients fall back to HTTP/2.", r: [L.cfHttp3] }
+  ]},
+  { id: "api-styles", n: "API styles", b: "How a client asks for something, and how to make asking twice safe.", c: [
+    { id: "rest", n: "REST", s: 1, k: "REST", o: "Resource-based HTTP APIs: GET, POST, PUT, DELETE on URLs.", w: "Public and client-facing APIs.",
+      h: "Each resource has a URL; HTTP methods express the action and status codes the result. Responses are usually JSON and can be cached by standard HTTP rules.",
+      t: "Simple and universal, but clients may need several calls or get more data than they need." },
+    { id: "grpc", n: "gRPC", s: 1, k: "gRPC", o: "Binary RPC over HTTP/2 with Protocol Buffers.", w: "Fast service-to-service calls.",
+      h: "Services and messages are defined in a .proto file and client and server code is generated. Calls are compact, typed, and can stream in both directions.",
+      t: "Fast and strongly typed, but harder to debug and less browser-friendly than REST.", r: [L.grpc] },
+    { id: "graphql", n: "GraphQL", k: "GraphQL", o: "The client asks for exactly the fields it needs in one query.", w: "Mobile clients with varied data needs.",
+      h: "A schema describes every type; the server resolves each requested field, often from several backends.",
+      t: "Flexible for clients, but caching is harder and one expensive query can overload the server.", r: [L.gql] },
+    { id: "idempotent", n: "Idempotent request", s: 1, k: "Idempotence", o: "Repeating it has the same effect as doing it once.", w: "Retries and payments.",
+      h: "GET, PUT and DELETE are idempotent by definition. A POST becomes idempotent when the client sends a unique key and the server stores the first result for that key.",
+      t: "The server must keep keys and results for a time window.", r: [L.mdnIdem, L.stripeIdem, L.awsIdem] },
+    { id: "pagination", n: "Pagination (offset vs cursor)", o: "Offset: page 5 of 20. Cursor: items after this ID.", w: "Feeds and long lists.",
+      h: "Offset pagination skips N rows, which gets slow and shows duplicates when data changes. A cursor encodes the last item seen, so the next query starts right after it using an index.",
+      t: "Cursors are fast and stable but can’t jump to an arbitrary page." }
+  ]},
+  { id: "realtime", n: "Real-time communication", b: "Four ways to get updates to a client, from simplest to most capable.", c: [
+    { id: "short-polling", n: "Short polling", k: "Polling (computer science)", o: "The client asks for updates every few seconds.", w: "Simple dashboards with low update rates.",
+      h: "A timer sends a normal HTTP request again and again; most responses say nothing changed.",
+      t: "Easy to build, but wastes requests and adds up to one interval of delay.", r: [L.rtVid] },
+    { id: "long-polling", n: "Long polling", k: "Push technology", o: "The server holds the request open until there is new data.", w: "Near-real-time updates where WebSockets aren’t possible.",
+      h: "The client sends a request; the server answers only when an event arrives or a timeout passes, and the client immediately asks again.",
+      t: "Fewer empty responses than polling, but every update still costs a new request.", r: [L.rtVid] },
+    { id: "sse", n: "Server-sent events", s: 1, k: "Server-sent events", o: "A one-way stream of events from server to client over HTTP.", w: "Live status, notifications, feeds.",
+      h: "The client opens one long-lived HTTP response and the server writes events as they happen. Browsers reconnect automatically and resume from the last event ID.",
+      t: "Server to client only; use WebSockets for two-way messaging.", r: [L.mdnSse, L.rtVid] },
+    { id: "websockets", n: "WebSockets", s: 1, k: "WebSocket", o: "A persistent two-way channel between client and server.", w: "Chat, multiplayer games, collaborative editing.",
+      h: "An HTTP request is upgraded to a WebSocket connection that stays open, and both sides can send messages at any time.",
+      t: "Long-lived connections are harder to balance and scale; you must track which server holds which user.", r: [L.mdnWs, L.rtVid] }
+  ]},
+  { id: "traffic", n: "Traffic management", b: "The components that sit between clients and your services.", c: [
+    { id: "load-balancer", n: "Load balancer (L4 vs L7)", s: 1, k: "Load balancing (computing)", o: "Spreads traffic across instances.", w: "Every horizontally scaled service.",
+      h: "An L4 balancer routes on IP and port without reading the payload, so it is fast. An L7 balancer reads HTTP and can route by path or header, terminate TLS and retry.",
+      t: "L7 is smarter but slower and more expensive per request.", r: [L.l4l7, L.igoLb, L.cfLb] },
+    { id: "lb-algorithms", n: "Load-balancing algorithms", o: "Round robin, least connections, consistent hashing.", w: "Sticky routing or requests with uneven cost.",
+      h: "Round robin rotates evenly; least connections favours idle servers; hashing on a key sends the same user or item to the same server.",
+      t: "Hash-based routing keeps caches warm but can create hot servers.", r: [L.cfLb] },
+    { id: "reverse-proxy", n: "Reverse proxy", s: 1, k: "Reverse proxy", o: "A server in front of your services: TLS termination, routing, compression.", w: "Nginx or Envoy in front of the app.",
+      h: "Clients only talk to the proxy, which forwards to backends and can cache, compress and hide the internal structure.",
+      t: "One more hop and component to run, though usually worth it.", r: [L.cfProxy] },
+    { id: "api-gateway", n: "API gateway", s: 1, o: "One entry point for all clients: auth, rate limiting, routing to services.", w: "Microservice architectures.",
+      h: "The gateway authenticates requests, applies limits, routes to the right service and can combine several calls into one response.",
+      t: "It can become a bottleneck and a single point of failure, so run it replicated.", r: [L.msGateway, L.azGw] },
+    { id: "cdn", n: "CDN", s: 1, k: "Content delivery network", o: "Caches content at edge locations near users.", w: "Images, video, static files, global users.",
+      h: "Users are routed to the nearest edge server; on a miss it fetches from your origin and caches the response for its TTL.",
+      t: "Great for static content; personalised content is harder to cache, and invalidations take time to spread.", r: [L.cfCdn] },
+    { id: "service-discovery", n: "Service discovery", k: "Service discovery", o: "How services find each other’s current addresses.", w: "Microservices with autoscaling.",
+      h: "Instances register in a registry (Consul, etcd, Kubernetes DNS) and report health; callers look up healthy addresses.",
+      t: "The registry itself must be highly available." },
+    { id: "service-mesh", n: "Service mesh", k: "Service mesh", o: "A sidecar proxy beside each service handles retries, mTLS and metrics.", w: "Many services with shared network concerns.",
+      h: "Every service’s traffic passes through a local proxy such as Envoy, configured centrally by Istio or Linkerd.",
+      t: "Consistent behaviour everywhere, at the cost of extra latency and operational complexity." }
+  ]}
+  ]},
+
+{ id: "databases", n: "Databases & Storage", hue: 265, icon: "db",
+  b: "Where data lives, how it stays correct under concurrency, and how it spreads across machines.",
+  r: [L.arpit, L.luke, L.pgIso, L.primer],
+  g: [
+  { id: "data-models", n: "Data models", b: "Picking the right kind of store for the access pattern.", c: [
+    { id: "sql-nosql", n: "SQL vs NoSQL", s: 1, k: "NoSQL", o: "Relational tables with joins and transactions vs key-value, document, wide-column or graph stores.", w: "Choosing the main database.",
+      h: "SQL gives schemas, joins and ACID transactions. NoSQL stores trade some of that for easy horizontal scaling or flexible schemas, modelled around specific queries.",
+      t: "Default to SQL unless scale or access patterns clearly need NoSQL." },
+    { id: "normalisation", n: "Normalisation vs denormalisation", k: "Database normalization", o: "No duplicated data vs duplicated data for fast reads.", w: "Read-heavy designs and NoSQL modelling.",
+      h: "Normalised data lives in one place and is joined at read time. Denormalised data copies fields into every record that needs them, so reads need no joins.",
+      t: "Denormalising speeds reads, but every update must change all copies." },
+    { id: "object-storage", n: "Object storage", s: 1, k: "Object storage", o: "Cheap, durable storage for large files (S3, GCS).", w: "Images, videos, backups, logs.",
+      h: "Files are stored as objects under keys with metadata and replicated for durability; the database keeps only the key.",
+      t: "Very cheap and durable, but slower than local disk and no in-place partial updates." },
+    { id: "time-series", n: "Time-series database", k: "Time series database", o: "Optimised for timestamped metrics.", w: "Monitoring, IoT, prices.",
+      h: "Data is stored in time order with heavy compression and automatic downsampling of old data.",
+      t: "Excellent for append-and-aggregate, poor for general queries." },
+    { id: "inverted-index", n: "Inverted index", k: "Inverted index", o: "A map from each word to the documents containing it.", w: "Text search.",
+      h: "Documents are split into terms; each term points to a list of document IDs, ranked by relevance (Elasticsearch, Lucene).",
+      t: "Fast search, but the index lags behind writes and must be synced from the main database." },
+    { id: "oltp-olap", n: "OLTP vs OLAP", k: "Online analytical processing", o: "Fast day-to-day transactions vs analytics over large history.", w: "Keeping reporting off the main database.",
+      h: "OLTP databases are row-oriented for small reads and writes. OLAP warehouses are column-oriented to scan and aggregate billions of rows; data flows in through ETL or CDC.",
+      t: "Two systems to keep in sync, but neither workload slows the other." }
+  ]},
+  { id: "transactions", n: "Transactions & concurrency", b: "Keeping data correct when many requests change it at once.", c: [
+    { id: "acid", n: "ACID", s: 1, k: "ACID", o: "Atomicity, consistency, isolation, durability.", w: "Money, orders, anything that must not half-happen.",
+      h: "Atomic: all or nothing. Consistent: rules always hold. Isolated: concurrent transactions don’t see each other’s partial work. Durable: once committed, it survives a crash.",
+      t: "Strong guarantees cost throughput and are hard to keep across machines." },
+    { id: "isolation-levels", n: "Isolation levels", s: 1, k: "Isolation (database systems)", o: "Read committed, repeatable read, serializable.", w: "Concurrent updates to the same data.",
+      h: "Read committed prevents dirty reads; repeatable read also prevents non-repeatable reads; serializable behaves as if transactions ran one at a time, preventing phantoms and lost updates.",
+      t: "Stronger levels prevent more anomalies but cause more blocking or aborted transactions.", r: [L.vlad, L.arpitIso, L.pgIso] },
+    { id: "locking", n: "Optimistic vs pessimistic locking", s: 1, k: "Optimistic concurrency control", o: "Check a version on write vs lock the row first.", w: "Booking, inventory, counters.",
+      h: "Optimistic: UPDATE … WHERE version = old; if no row changed, someone else won, so retry. Pessimistic: SELECT … FOR UPDATE holds a lock until commit.",
+      t: "Optimistic suits low contention; pessimistic suits high contention but can deadlock and blocks others.", r: [L.arpitConc, L.vlad] },
+    { id: "mvcc", n: "MVCC", k: "Multiversion concurrency control", o: "Readers see a snapshot and don’t block writers.", w: "Explaining how Postgres handles concurrency.",
+      h: "Each write creates a new row version tagged with transaction IDs, and each transaction sees the versions valid at its snapshot. Old versions are cleaned up later (vacuum).",
+      t: "Great read concurrency, but old versions take space and need cleanup.", r: [L.pgMvcc] }
+  ]},
+  { id: "indexing", n: "Indexes & storage engines", b: "How databases find and store data on disk.", c: [
+    { id: "btree", n: "Index (B-tree)", s: 1, k: "B-tree", o: "A sorted structure that makes lookups and range queries fast.", w: "Any slow query.",
+      h: "A balanced tree keeps keys in order across pages, so finding a key takes a few page reads and a range is a scan of neighbouring leaves.",
+      t: "Every index speeds reads but slows writes and uses storage.", r: [L.luke, L.arpitBtree] },
+    { id: "composite-index", n: "Composite index", o: "An index on several columns, used left to right.", w: "Queries that filter on two or more fields.",
+      h: "An index on (country, city) helps WHERE country = ? and WHERE country = ? AND city = ?, but not WHERE city = ? on its own.",
+      t: "Column order matters: equality filters first, range filters last.", r: [L.luke] },
+    { id: "lsm-tree", n: "LSM tree", k: "Log-structured merge-tree", o: "Write-optimised storage: write to memory, flush and merge in the background.", w: "Very write-heavy workloads.",
+      h: "Writes go to an in-memory table and a log, then are flushed as sorted files that background compaction merges (Cassandra, RocksDB). Bloom filters skip files during reads.",
+      t: "Fast writes, but reads may check several files and compaction uses disk I/O." },
+    { id: "wal", n: "Write-ahead log (WAL)", k: "Write-ahead logging", o: "Record a change in a log before applying it.", w: "Explaining how databases stay durable.",
+      h: "The log is appended sequentially and flushed on commit; after a crash the database replays it. The same log feeds replication and CDC.",
+      t: "Each commit waits for a disk flush; group commit batches them." }
+  ]},
+  { id: "replication", n: "Replication", b: "Copies of data for read scaling and surviving failures.", c: [
+    { id: "leader-follower", n: "Leader-follower replication", s: 1, k: "Replication (computing)", o: "One leader takes writes and copies them to followers that serve reads.", w: "Read scaling and failover.",
+      h: "The leader streams its log to followers. If the leader fails, a follower is promoted.",
+      t: "Simple, but writes are limited to one node and failover can lose recent writes." },
+    { id: "multi-leader", n: "Multi-leader and leaderless", k: "Multi-master replication", o: "Several nodes accept writes; conflicts must be resolved.", w: "Multi-region writes, high availability.",
+      h: "Multi-leader: each region has a leader that syncs with the others. Leaderless (Dynamo-style): clients write to several replicas and use quorums.",
+      t: "Higher write availability, but conflicting writes need a resolution rule.", r: [L.dynamo] },
+    { id: "replication-lag", n: "Replication lag", s: 1, o: "Followers are behind the leader, so a read may return old data.", w: "“I just posted, why can’t I see it?”",
+      h: "Asynchronous replication means followers apply changes a little later. Fix the visible symptom by reading a user’s own writes from the leader for a short time.",
+      t: "Routing reads to the leader fixes staleness but adds load there." },
+    { id: "sync-async", n: "Synchronous vs asynchronous replication", o: "Wait for followers before confirming a write, or don’t.", w: "The durability vs latency trade-off.",
+      h: "Synchronous: the commit returns only after a follower has the data, so failover loses nothing. Asynchronous: the commit returns immediately. Semi-synchronous waits for one follower.",
+      t: "Synchronous is safer but slower, and stalls if the follower is down." }
+  ]},
+  { id: "partitioning", n: "Partitioning", b: "Splitting data across machines when one is not enough.", c: [
+    { id: "sharding", n: "Sharding", s: 1, k: "Shard (database architecture)", o: "Splitting data across machines by key.", w: "Data or write load too big for one machine.",
+      h: "Hash partitioning spreads keys evenly; range partitioning keeps neighbouring keys together for range scans. A routing layer maps each key to its shard.",
+      t: "Cross-shard queries and transactions get hard, so pick the shard key from the access pattern.", r: [L.azSharding] },
+    { id: "hot-partition", n: "Hot partition", s: 1, o: "One shard gets far more traffic than the others.", w: "Uneven load after sharding.",
+      h: "A celebrity account or viral item concentrates traffic on one key. Fix it by splitting the key with a suffix, caching it, or giving it a dedicated shard.",
+      t: "Key splitting spreads writes but makes reads gather from several places." },
+    { id: "resharding", n: "Resharding", o: "Moving data when shards are added or removed.", w: "Growth over time.",
+      h: "Pre-split into many small logical partitions and move whole partitions between machines, instead of rehashing every key.",
+      t: "Online moves need double writes or copy-then-switch, which is complex." },
+    { id: "consistent-hashing", n: "Consistent hashing", s: 1, k: "Consistent hashing", o: "Keys and nodes sit on a ring; adding a node moves only a small share of keys.", w: "Distributed caches and sharded storage.",
+      h: "Hash nodes and keys onto a ring; each key belongs to the next node clockwise. Virtual nodes give each server many points, so load evens out.",
+      t: "Balances well with virtual nodes, but hot keys still need separate handling.", r: [L.chVid] }
+  ]}
+  ]},
+
+{ id: "caching", n: "Caching", hue: 38, icon: "bolt",
+  b: "Keeping hot data close so the database doesn’t answer every request.",
+  r: [L.azCacheAside, L.bbg, L.primer],
+  g: [
+  { id: "cache-strategies", n: "Caching strategies", b: "When data enters the cache and when it reaches the database.", c: [
+    { id: "cache-aside", n: "Cache-aside", s: 1, k: "Cache (computing)", o: "Check the cache; on a miss read the database and fill the cache.", w: "The default caching pattern.",
+      h: "Reads try the cache first. Writes update the database and delete the cache entry, so the next read reloads it.",
+      t: "Simple and resilient, but the first read after a change is slower and races can leave stale data briefly.", r: [L.azCacheAside] },
+    { id: "write-through", n: "Write-through", s: 1, o: "Writes go to the cache and the database together.", w: "Reads must see fresh data right after a write.",
+      h: "Every write updates both before returning, so the cache is always current for written keys.",
+      t: "Slower writes, and the cache fills with data that may never be read." },
+    { id: "write-back", n: "Write-back", o: "Writes go to the cache first and reach the database later.", w: "Very high write rates where losing a few writes is acceptable.",
+      h: "The cache confirms immediately and flushes to the database in batches.",
+      t: "Fast writes, but data is lost if the cache fails before flushing." },
+    { id: "local-distributed", n: "Local vs distributed cache", o: "In-process memory vs a shared cache cluster.", w: "Several app instances need the same cached data.",
+      h: "A local cache is fastest but each instance has its own copy; Redis or Memcached gives one shared copy over the network.",
+      t: "Local caches can disagree across instances; distributed caches add a network hop." }
+  ]},
+  { id: "freshness", n: "Freshness & eviction", b: "Deciding what stays in the cache and for how long.", c: [
+    { id: "ttl", n: "TTL (time to live)", s: 1, k: "Time to live", o: "An entry expires automatically after a set time.", w: "Data that may be slightly stale.",
+      h: "Each entry carries an expiry; after it, the next read reloads from the source. Add random jitter so entries don’t all expire together.",
+      t: "Short TTLs mean fresher data but more database load." },
+    { id: "eviction", n: "Eviction (LRU, LFU)", s: 1, k: "Cache replacement policies", o: "What to remove when the cache is full.", w: "Sizing the cache.",
+      h: "LRU removes the least recently used entry; LFU removes the least frequently used. Most caches approximate these cheaply.",
+      t: "LRU suits recency-driven traffic; LFU resists one-off scans pushing out popular items." },
+    { id: "invalidation", n: "Cache invalidation", s: 1, k: "Cache invalidation", o: "Removing or updating cached data when the source changes.", w: "Any cache of data that changes.",
+      h: "Delete on write, expire with TTLs, or listen to change events (CDC) and evict the affected keys.",
+      t: "Event-driven invalidation is fresher but has more moving parts; TTLs are simple but stale for a while." },
+    { id: "negative-caching", n: "Negative caching", o: "Caching “not found” results.", w: "Lookups for things that often don’t exist.",
+      h: "Store a short-lived marker for missing keys so repeated misses don’t reach the database.",
+      t: "A newly created item can look missing until the marker expires." }
+  ]},
+  { id: "cache-failures", n: "Failure modes & metrics", b: "What goes wrong with caches under load, and how to tell it’s working.", c: [
+    { id: "cache-stampede", n: "Cache stampede", s: 1, k: "Cache stampede", o: "A popular entry expires and thousands of requests hit the database at once.", w: "Hot keys.",
+      h: "Let one request rebuild the entry while others wait or get the old value (request coalescing), or refresh popular keys before they expire.",
+      t: "Serving the old value briefly is usually better than overloading the database." },
+    { id: "hot-key", n: "Hot key", o: "One cache key receives a huge share of traffic.", w: "Celebrity profiles, flash sales.",
+      h: "Keep a copy in each app server’s local cache, or replicate the key across cache nodes using suffixes.",
+      t: "Extra copies make invalidation harder." },
+    { id: "hit-rate", n: "Cache hit rate", o: "Share of requests served from the cache.", w: "Proving the cache is worth having.",
+      h: "Hit rate = hits ÷ (hits + misses). Watch it alongside eviction rate and memory use.",
+      t: "Chasing a higher hit rate with long TTLs trades away freshness." },
+    { id: "request-coalescing", n: "Request coalescing", s: 1, o: "Many identical in-flight requests share one execution (single-flight).", w: "Cache stampedes and duplicate work.",
+      h: "Keep a map of keys currently being computed; later requests for the same key wait for that result instead of starting another.",
+      t: "Waiters share the first request’s failure, so retry carefully." }
+  ]}
+  ]},
+
+{ id: "distributed", n: "Distributed Systems", hue: 310, icon: "nodes",
+  b: "Consistency, consensus and coordination when machines fail and networks split.",
+  r: [L.kleppmann, L.jepsen, L.raftViz],
+  g: [
+  { id: "consistency", n: "Consistency models", b: "What a read is allowed to return after a write.", c: [
+    { id: "cap", n: "CAP theorem", s: 1, k: "CAP theorem", o: "During a network partition, choose consistency or availability.", w: "Explaining behaviour when nodes can’t talk.",
+      h: "Partitions will happen, so the real choice is CP (refuse requests to stay correct) or AP (keep answering, possibly stale, and reconcile later).",
+      t: "Choose per feature: balances are CP, likes are AP.", r: [L.jepsen] },
+    { id: "pacelc", n: "PACELC", k: "PACELC design principle", o: "Even without a partition, latency trades against consistency.", w: "Explaining why strong consistency is slower.",
+      h: "If Partition: Availability or Consistency; Else: Latency or Consistency. Coordinating replicas on every write costs round trips.",
+      t: "Lower latency means accepting weaker consistency." },
+    { id: "strong-consistency", n: "Strong consistency", s: 1, k: "Linearizability", o: "Every read sees the latest write, as if there were one copy (linearisability).", w: "Balances, inventory, locks.",
+      h: "Achieved with a single leader per item or with consensus; reads go through the leader or a quorum.",
+      t: "Higher latency and lower availability during failures.", r: [L.jepsen] },
+    { id: "eventual-consistency", n: "Eventual consistency", s: 1, k: "Eventual consistency", o: "Copies converge if writes stop; reads may be stale for a while.", w: "Likes, feeds, view counts.",
+      h: "Writes propagate asynchronously; conflicts resolve by rules such as last-write-wins or merging (CRDTs).",
+      t: "Fast and available, but the application must tolerate stale reads." },
+    { id: "read-your-writes", n: "Read-your-writes", o: "A user always sees their own updates.", w: "Profile edits, posts.",
+      h: "Route a user’s reads to the leader for a while after they write, or remember the version they wrote and wait until a replica has it.",
+      t: "Extra routing logic and load on the leader." },
+    { id: "causal-consistency", n: "Causal consistency", k: "Causal consistency", o: "If one event caused another, everyone sees them in that order.", w: "Comment replies, chat.",
+      h: "Track dependencies between writes (version vectors) and never show an event before the events it depends on.",
+      t: "Stronger than eventual and cheaper than linearisable, but needs metadata on every write." },
+    { id: "quorum", n: "Quorum (R + W > N)", s: 1, k: "Quorum (distributed computing)", o: "Read and write overlaps that guarantee seeing the latest write.", w: "Tuning consistency in leaderless stores.",
+      h: "With N replicas, writes wait for W acknowledgements and reads ask R nodes. If R + W > N, every read overlaps the latest write. N = 3, W = 2, R = 2 is common.",
+      t: "Bigger quorums are more consistent but slower and less available.", r: [L.dynamo] }
+  ]},
+  { id: "coordination", n: "Consensus & coordination", b: "Getting machines to agree on one leader, one owner, one order.", c: [
+    { id: "consensus", n: "Consensus (Raft, Paxos)", s: 1, k: "Raft (algorithm)", o: "Nodes agree on one value or log order despite failures.", w: "Leader election and config stores like etcd and ZooKeeper.",
+      h: "In Raft, a leader is elected by majority vote for a term, appends entries to followers, and commits an entry once a majority has it. A 5-node cluster survives 2 failures.",
+      t: "Every write needs a majority round trip, so use consensus for metadata, not bulk data.", r: [L.raftViz, L.raft, L.kleppmann] },
+    { id: "leader-election", n: "Leader election", s: 1, k: "Leader election", o: "Choosing one node to coordinate.", w: "Schedulers, primary databases.",
+      h: "Usually done through a consensus service or a lease in etcd or ZooKeeper; the leader must keep renewing it.",
+      t: "Two leaders can briefly coexist, so pair it with fencing tokens.", r: [L.awsLeader, L.azLeader] },
+    { id: "split-brain", n: "Split brain", s: 1, k: "Split-brain (computing)", o: "Two nodes both think they’re the leader.", w: "Network partitions.",
+      h: "Prevent it by requiring a majority to elect a leader, so only one side of a partition can have one, and by fencing the old leader.",
+      t: "Requiring a majority means the minority side stops serving." },
+    { id: "lease", n: "Lease", s: 1, k: "Lease (computer science)", o: "Time-limited ownership that must be renewed.", w: "Locks, leaders, task ownership.",
+      h: "The holder renews before expiry; if it crashes, the lease runs out and someone else can take over.",
+      t: "Short leases recover faster but risk false expiry during pauses such as garbage collection." },
+    { id: "fencing-token", n: "Fencing token", s: 1, o: "An increasing number issued with each lease; storage rejects older numbers.", w: "Stopping a stale owner after its lease expired.",
+      h: "Each new lease gets a higher token. The storage remembers the highest token seen and rejects writes that carry a lower one.",
+      t: "The protected storage must check the token, which needs support on that side.", r: [L.kLock] },
+    { id: "distributed-lock", n: "Distributed lock", s: 1, k: "Distributed lock manager", o: "A lock shared across machines, usually built on a lease.", w: "Only one worker may process an item.",
+      h: "Take a lease-based lock in etcd, ZooKeeper or Redis together with a fencing token, then release it or let it expire.",
+      t: "Locks reduce throughput; idempotent designs or partitioning work by key are often better.", r: [L.kLock] }
+  ]},
+  { id: "time-ordering", n: "Time & ordering", b: "Why wall clocks can’t order events across machines.", c: [
+    { id: "clock-skew", n: "Clock skew", k: "Clock skew", o: "Machines’ clocks disagree.", w: "“Last write wins” goes wrong.",
+      h: "Clocks drift and NTP corrections jump, so two events milliseconds apart can be ordered wrongly across machines.",
+      t: "Use logical clocks or a single sequencer when order matters." },
+    { id: "logical-clocks", n: "Logical clocks", k: "Vector clock", o: "Ordering events with counters instead of wall-clock time (Lamport, vector).", w: "Detecting concurrent updates.",
+      h: "Lamport clocks give a total order consistent with causality. Vector clocks keep a counter per node and can tell when two updates were concurrent.",
+      t: "Vector clocks grow with the number of nodes." }
+  ]},
+  { id: "delivery", n: "Delivery & transactions", b: "Making operations safe to repeat and atomic across services.", c: [
+    { id: "delivery-semantics", n: "Delivery semantics", s: 1, o: "At-most-once, at-least-once, exactly-once.", w: "Every queue or event pipeline.",
+      h: "At-most-once may lose messages; at-least-once may duplicate them; exactly-once in practice means at-least-once delivery plus idempotent processing.",
+      t: "The stronger the guarantee, the more coordination it needs.", r: [L.eos] },
+    { id: "idempotency-key", n: "Idempotency key", s: 1, o: "A unique ID per operation, so a repeat is recognised and ignored.", w: "Payments, retries, webhooks.",
+      h: "The client generates the key; the server stores key → result in the same transaction as the effect and returns the stored result on a repeat.",
+      t: "Keys must be kept long enough to cover every retry.", r: [L.stripeIdem, L.awsIdem] },
+    { id: "two-phase-commit", n: "Two-phase commit (2PC)", k: "Two-phase commit protocol", o: "Prepare everywhere, then commit everywhere.", w: "Explaining why sagas are preferred across services.",
+      h: "A coordinator asks all participants to prepare; if all say yes, it tells them to commit. Participants hold locks in between.",
+      t: "Atomic, but blocks if the coordinator fails midway and couples services tightly." }
+  ]}
+  ]},
+
+{ id: "messaging", n: "Messaging & Events", hue: 150, icon: "queue",
+  b: "Queues, logs and event-driven patterns for async work between services.",
+  r: [L.kafka, L.msIndex, L.msPatVid],
+  g: [
+  { id: "brokers", n: "Brokers & topics", b: "How messages are stored, ordered and shared between consumers.", c: [
+    { id: "queue-vs-log", n: "Message queue vs log", s: 1, k: "Message queue", o: "A queue deletes a message once handled; a log keeps it for replay.", w: "Choosing a broker.",
+      h: "Queues (RabbitMQ, SQS) hand each message to one consumer and remove it. Logs (Kafka) append messages and let each consumer group read at its own offset, replaying when needed.",
+      t: "Logs enable replay and many readers; queues make per-message acknowledgement and routing simpler.", r: [L.kafka] },
+    { id: "pub-sub", n: "Pub/sub", s: 1, k: "Publish–subscribe pattern", o: "Publishers send to a topic; every subscriber gets a copy.", w: "Fan-out of events to several services.",
+      h: "Producers don’t know who consumes; each subscription receives every message independently.",
+      t: "Loose coupling, but it’s harder to trace who depends on an event.", r: [L.azPubSub] },
+    { id: "partition-ordering", n: "Partition and ordering", s: 1, o: "Kafka keeps order only within a partition.", w: "“All events for one account must stay in order.”",
+      h: "The message key is hashed to choose the partition, so all events with the same key land in the same partition, in order.",
+      t: "More partitions mean more parallelism, but there’s no ordering across keys.", r: [L.kafka] },
+    { id: "consumer-group", n: "Consumer group", s: 1, o: "Consumers that share a topic’s partitions.", w: "Scaling consumers.",
+      h: "Each partition is read by exactly one consumer in the group; more consumers than partitions leaves some idle.",
+      t: "Parallelism is capped by the partition count, so choose it with growth in mind." },
+    { id: "offset", n: "Offset", o: "A consumer’s position in the log.", w: "Resuming after a crash.",
+      h: "Committing the offset after processing gives at-least-once; committing before processing gives at-most-once.",
+      t: "Commit after processing and make processing idempotent." },
+    { id: "rebalance", n: "Rebalance", o: "Partitions are reassigned when consumers join or leave.", w: "Consumer crashes and scaling events.",
+      h: "The group coordinator redistributes partitions; consumers stop, commit offsets and resume on their new assignments. Cooperative rebalancing moves only the affected partitions.",
+      t: "Frequent rebalances pause processing, so keep consumer sessions stable." }
+  ]},
+  { id: "msg-failures", n: "Failure handling", b: "Keeping a pipeline flowing when some messages or consumers fail.", c: [
+    { id: "dead-letter-queue", n: "Dead-letter queue (DLQ)", s: 1, k: "Dead letter queue", o: "Where messages go after repeated failures.", w: "Bad data, poison messages.",
+      h: "After N retries, the consumer moves the message to a DLQ with error details and continues; operators inspect and replay it later.",
+      t: "Keeps the pipeline moving, but someone must own and empty the DLQ." },
+    { id: "poison-message", n: "Poison message", o: "A message that fails every time it’s processed.", w: "Explaining why a DLQ exists.",
+      h: "Without a retry limit, one bad message blocks its partition forever.",
+      t: "Moving it aside breaks strict ordering for that key, so decide which matters more." },
+    { id: "backpressure", n: "Backpressure", s: 1, o: "Slowing producers when consumers can’t keep up.", w: "Spikes, slow downstream services.",
+      h: "Bounded queues reject or delay new work, pull-based consumers take only what they can handle, and producers slow down on those signals.",
+      t: "Protects the system, but pushes delay or errors back to callers.", r: [L.azQbll] }
+  ]},
+  { id: "event-patterns", n: "Event-driven patterns", b: "The patterns that make multi-service workflows reliable.", c: [
+    { id: "async-jobs", n: "Async job queue and workers", s: 1, o: "Accept a request, return a job ID, process in the background.", w: "Anything taking seconds or minutes.",
+      h: "The API writes the job to a queue and returns 202 with a job ID; workers process it and update its status, which the client polls or receives by push.",
+      t: "Better responsiveness and scaling, but the client must handle a pending state.", r: [L.azCompeting] },
+    { id: "event-driven", n: "Event-driven architecture", s: 1, k: "Event-driven architecture", o: "Services react to events instead of calling each other.", w: "Loose coupling between teams.",
+      h: "A service publishes facts such as OrderPlaced; other services subscribe and act independently.",
+      t: "Easier to extend, harder to follow end to end, so invest in tracing." },
+    { id: "outbox", n: "Transactional outbox", s: 1, o: "Write the data and an outbox row in one transaction; publish later.", w: "Updating a database and publishing an event reliably.",
+      h: "Because the event row commits with the data, it can’t be lost. A relay or CDC reads the outbox and publishes to the broker, retrying until it succeeds.",
+      t: "Events arrive at least once and slightly delayed, so consumers must be idempotent.", r: [L.msOutbox, L.dualWrite, L.dgOutbox] },
+    { id: "cdc", n: "Change data capture (CDC)", s: 1, k: "Change data capture", o: "Stream a database’s changes from its log.", w: "Syncing search indexes, caches and warehouses.",
+      h: "A connector such as Debezium tails the database’s replication log and publishes every insert, update and delete as an event.",
+      t: "No dual writes, but events mirror table structure, which couples consumers to the schema.", r: [L.debezium] },
+    { id: "saga", n: "Saga", s: 1, o: "A multi-step transaction across services, with an undo step for each.", w: "Checkout, payments, booking.",
+      h: "Each step commits locally; if a later step fails, earlier steps are undone by compensating actions. Choreography uses events; orchestration uses a central coordinator.",
+      t: "No distributed locks, but intermediate states are visible and compensations must be designed carefully.", r: [L.msSaga, L.azSaga, L.sagaTalk] },
+    { id: "event-sourcing", n: "Event sourcing", o: "Store every change as an event; rebuild state from the events.", w: "Ledgers and audit trails.",
+      h: "The event log is the source of truth; current state is a projection, with snapshots to speed up rebuilding.",
+      t: "Full history and audit, but schema changes and queries are harder.", r: [L.fowlerES, L.azES] },
+    { id: "cqrs", n: "CQRS", s: 1, o: "Separate models for writes and reads.", w: "Read patterns differ a lot from writes.",
+      h: "Commands update a write model; events update one or more read models shaped for queries.",
+      t: "Read models are eventually consistent and there’s more to run.", r: [L.fowlerCqrs, L.azCqrs] },
+    { id: "fan-out", n: "Fan-out", o: "One event triggers many deliveries.", w: "Notifications and feeds.",
+      h: "A single message is copied to many queues or recipients, usually through pub/sub plus worker pools.",
+      t: "One event can create a huge load, so batch and rate-limit the fan-out." }
+  ]}
+  ]},
+
+{ id: "reliability", n: "Reliability & Operations", hue: 352, icon: "shield",
+  b: "Surviving failures, protecting services under load, and knowing when something is wrong.",
+  r: [L.sreToc, L.awsLib, L.resVid],
+  g: [
+  { id: "redundancy", n: "Redundancy & recovery", b: "No single failure should take the system down.", c: [
+    { id: "spof", n: "Single point of failure", s: 1, k: "Single point of failure", o: "One component whose failure takes everything down.", w: "The first question of every reliability pass.",
+      h: "Walk every box in the design and ask what happens if it dies; anything without a replacement is a SPOF.",
+      t: "Removing every SPOF costs money, so prioritise by impact." },
+    { id: "failover", n: "Redundancy and failover", s: 1, k: "Failover", o: "Spare copies take over on failure.", w: "Databases, regions, load balancers.",
+      h: "Active-passive keeps a standby that is promoted on failure; active-active runs all copies and shifts load away from the failed one.",
+      t: "Active-active uses capacity better but must handle conflicts and split load." },
+    { id: "health-checks", n: "Health checks and heartbeats", s: 1, k: "Heartbeat (computing)", o: "Regular “I’m alive” signals.", w: "Load balancers and schedulers.",
+      h: "Liveness checks say the process runs; readiness checks say it can serve. Missed heartbeats trigger removal or failover.",
+      t: "Over-sensitive checks cause flapping; lax ones keep broken nodes in rotation.", r: [L.azHealth] },
+    { id: "rpo-rto", n: "RPO and RTO", k: "Disaster recovery", o: "How much data you can lose, and how long recovery may take.", w: "Disaster recovery plans.",
+      h: "RPO is set by how often data is copied (synchronous replication gives zero); RTO by how fast you can fail over and restore.",
+      t: "Lower RPO and RTO cost more infrastructure." },
+    { id: "reconciliation", n: "Reconciliation job", o: "A periodic job that compares two systems and fixes differences.", w: "Catching what events or retries missed.",
+      h: "Compare source and target by counts, checksums or records, then repair gaps or raise an alert.",
+      t: "Adds load and needs a clear rule for which side is right." }
+  ]},
+  { id: "resilience", n: "Resilience patterns", b: "Stopping one slow or failing dependency from spreading.", c: [
+    { id: "timeout", n: "Timeout", s: 1, o: "A limit on how long to wait for a call.", w: "Every network call.",
+      h: "Set timeouts from the dependency’s p99 plus a margin, and make the total budget across retries fit the caller’s own deadline.",
+      t: "Too short causes false failures; too long ties up threads.", r: [L.awsRetry] },
+    { id: "retry-backoff", n: "Retry with backoff and jitter", s: 1, k: "Exponential backoff", o: "Wait longer after each failure, with randomness.", w: "Transient failures.",
+      h: "Delay = base × 2^attempt, capped, plus random jitter so clients don’t retry in sync. Retry only idempotent operations, a limited number of times.",
+      t: "Retries raise success rates but add load to a struggling service.", r: [L.awsRetry, L.azRetry] },
+    { id: "retry-storm", n: "Retry storm", o: "Retries multiply load on a service that’s already failing.", w: "Explaining why retries need limits.",
+      h: "If 3 layers each retry 3 times, one failure becomes 27 calls at the bottom. Retry at one layer only and use retry budgets.",
+      t: "Fewer retries means occasionally surfacing a transient error.", r: [L.awsRetry] },
+    { id: "circuit-breaker", n: "Circuit breaker", s: 1, k: "Circuit breaker design pattern", o: "Stop calling a failing dependency for a while.", w: "A dependency keeps failing.",
+      h: "Closed: calls pass. After too many failures it opens and fails fast. After a timeout, half-open lets a few test calls through to decide whether to close again.",
+      t: "Protects both sides, but needs a fallback for when it’s open.", r: [L.fowlerCb, L.azCb, L.resVid, L.msCb] },
+    { id: "bulkhead", n: "Bulkhead", o: "Separate resource pools so one failure can’t take everything.", w: "Isolating a slow dependency.",
+      h: "Give each dependency its own thread or connection pool, so one slow service exhausts only its own pool.",
+      t: "Pools sized separately may sit idle while others are full.", r: [L.azBulkhead] }
+  ]},
+  { id: "overload", n: "Overload protection", b: "Staying up when demand exceeds capacity.", c: [
+    { id: "rate-limiting", n: "Rate limiting", s: 1, k: "Rate limiting", o: "Cap requests per client.", w: "Abuse, fairness, protecting a backend.",
+      h: "Token bucket: tokens refill at a fixed rate and each request spends one, allowing short bursts. Sliding window counts requests in the last N seconds.",
+      t: "Return 429 with Retry-After; in a cluster, keep counters in a shared store like Redis.", r: [L.cfRate, L.azRate, L.rlVid] },
+    { id: "load-shedding", n: "Load shedding", s: 1, o: "Deliberately rejecting low-priority work under overload.", w: "Peak traffic.",
+      h: "When queues or latency cross a threshold, reject the cheapest-to-lose requests early, before doing any work on them.",
+      t: "Some users get errors, but the system keeps serving the rest.", r: [L.awsShed, L.sreOverload] },
+    { id: "graceful-degradation", n: "Graceful degradation", s: 1, k: "Fault tolerance", o: "Keep the core working when a non-essential part fails.", w: "“Without recommendations, the page still loads.”",
+      h: "Mark each dependency as critical or optional; for optional ones, use fallbacks, cached values, or hide the feature.",
+      t: "Users get a reduced experience, which must be designed and tested." }
+  ]},
+  { id: "observability", n: "Observability & SLOs", b: "Defining reliability and seeing what production is doing.", c: [
+    { id: "sli-slo-sla", n: "SLI, SLO, SLA", s: 1, k: "Service-level objective", o: "What you measure, your target, and the customer contract.", w: "Defining reliability.",
+      h: "SLI: share of requests under 300 ms. SLO: 99.9% of them over 30 days. SLA: the contract with penalties, set looser than the SLO.",
+      t: "Each extra nine of reliability costs far more than the last.", r: [L.sreSlo] },
+    { id: "error-budget", n: "Error budget", s: 1, o: "Allowed unreliability: 99.9% means about 43 minutes a month.", w: "Balancing releases against stability.",
+      h: "While budget remains, ship freely; when it’s spent, freeze risky changes and work on reliability.",
+      t: "Only works if product and engineering agree to honour it.", r: [L.sreRisk] },
+    { id: "metrics-logs-traces", n: "Metrics, logs and traces", s: 1, k: "Observability (software)", o: "Numbers over time, event records, and one request’s path across services.", w: "Debugging production.",
+      h: "Metrics show that something is wrong, traces show where, logs show why. A trace ID passed through every call ties them together (OpenTelemetry).",
+      t: "High-cardinality data and full tracing get expensive, so sample." },
+    { id: "golden-signals", n: "Golden signals", o: "Latency, traffic, errors, saturation.", w: "What to put on the first dashboard.",
+      h: "Watch these four for every service and alert on symptoms users feel, not on every internal cause.",
+      t: "They tell you something is wrong, not always why.", r: [L.sreMon] }
+  ]},
+  { id: "releases", n: "Safe releases", b: "Shipping changes without taking production down.", c: [
+    { id: "canary-blue-green", n: "Canary and blue-green deployment", s: 1, k: "Blue–green deployment", o: "Roll out to a small slice first, or switch between two full environments.", w: "Safe releases.",
+      h: "Canary: send a few percent of traffic to the new version and compare metrics before widening. Blue-green: deploy to an idle copy, switch traffic, and keep the old one for instant rollback.",
+      t: "Canary limits the impact of a bad release; blue-green needs double capacity.", r: [L.fowlerCanary, L.fowlerBg] },
+    { id: "feature-flag", n: "Feature flag", k: "Feature toggle", o: "Turn features on or off without deploying.", w: "Gradual rollout and instant rollback.",
+      h: "Code checks a flag at runtime, often per user or percentage, controlled from a config service.",
+      t: "Old flags pile up as technical debt, so remove them after launch.", r: [L.fowlerFlags] }
+  ]}
+  ]},
+
+{ id: "building-blocks", n: "Building Blocks", hue: 80, icon: "blocks",
+  b: "Reusable answers. Most interview questions combine two or three of these.",
+  r: [L.hiPatterns, L.hi7, L.topk, L.rlVid],
+  g: [
+  { id: "data-structures", n: "Data structures at scale", b: "Compact structures that answer questions over huge data.", c: [
+    { id: "bloom-filter", n: "Bloom filter", s: 1, k: "Bloom filter", o: "Says “definitely not present” or “maybe present”.", w: "Avoiding needless lookups; crawler deduplication.",
+      h: "A bit array and several hash functions: adding an item sets bits; checking finds an unset bit means absent. False positives happen, false negatives never.",
+      t: "Tiny memory, but you can’t delete items without a counting variant." },
+    { id: "sketches", n: "Count-min sketch and HyperLogLog", k: "Count–min sketch", o: "Approximate counts and distinct counts in little memory.", w: "Trending topics, unique visitors.",
+      h: "A count-min sketch estimates how often an item appeared using a small grid of counters. HyperLogLog estimates distinct counts within about 1–2% using kilobytes.",
+      t: "Small and fast but approximate: fine for analytics, not for billing.", r: [L.topk] },
+    { id: "sorted-set", n: "Sorted set", s: 1, o: "A set ordered by score (Redis ZSET).", w: "Leaderboards and ranking.",
+      h: "Updating a score and reading a member’s rank or the top N both take O(log N).",
+      t: "Lives in memory; very large boards need sharding or periodic snapshots.", r: [L.redisZset] },
+    { id: "geo-index", n: "Geospatial index", s: 1, k: "Geohash", o: "Split the map into cells so “what’s nearby” becomes a fast lookup (geohash, quadtree).", w: "Ride hailing, “restaurants near me”.",
+      h: "Geohash encodes a location as a string where shared prefixes mean nearby cells; a quadtree splits dense areas into four, recursively. Search the user’s cell and its neighbours.",
+      t: "Cell edges need neighbour checks, and dense cities need finer cells." }
+  ]},
+  { id: "ids-encoding", n: "IDs & encoding", b: "Unique identifiers without a central counter.", c: [
+    { id: "unique-ids", n: "Unique ID generation", s: 1, k: "Snowflake ID", o: "IDs created without a central counter.", w: "Any distributed system that creates records.",
+      h: "Snowflake-style IDs combine a timestamp, a machine ID and a per-millisecond sequence into 64 bits, so they’re unique and roughly time-ordered. UUIDv4 is random; UUIDv7 is time-ordered.",
+      t: "Timestamp-based IDs depend on sane clocks; random UUIDs index poorly." },
+    { id: "base62", n: "Base62 encoding", k: "Base62", o: "Turning a number into a short string of letters and digits.", w: "URL shorteners.",
+      h: "With 0–9, a–z and A–Z, 7 characters give 62⁷ ≈ 3.5 trillion combinations.",
+      t: "Sequential IDs encoded this way are guessable; add randomness if that matters." }
+  ]},
+  { id: "data-flow", n: "Data flow", b: "Doing work at write time, read time, or in batches.", c: [
+    { id: "fan-out-write-read", n: "Fan-out on write vs on read", s: 1, o: "Precompute each feed when someone posts, or build it when the user opens the app.", w: "News feed, timeline.",
+      h: "Push: on each post, write it into every follower’s feed, so reads are instant. Pull: at read time, merge recent posts from everyone followed. Hybrid: push for most users, pull for celebrities.",
+      t: "Push makes writes very expensive for accounts with millions of followers." },
+    { id: "materialized-view", n: "Materialised view", s: 1, k: "Materialized view", o: "Calculate results ahead of time and store them ready to read.", w: "Dashboards, leaderboards, feeds.",
+      h: "A background job or event stream keeps a read-optimised table up to date, so queries become simple lookups.",
+      t: "Faster reads, but views lag behind writes and cost storage.", r: [L.azMv] },
+    { id: "batching", n: "Batching", s: 1, o: "Group many small operations into one.", w: "High write volume, cost reduction.",
+      h: "Buffer items until a size or time limit, then write them together, cutting per-call overhead.",
+      t: "Higher throughput, but each item waits up to the batch interval." }
+  ]},
+  { id: "files", n: "Files", b: "Moving large files without routing them through your servers.", c: [
+    { id: "presigned-url", n: "Pre-signed URL", s: 1, o: "A time-limited URL to upload or download directly from object storage.", w: "File and video upload.",
+      h: "The API checks permissions and signs a URL for one object; the client transfers bytes straight to storage, bypassing your servers.",
+      t: "Saves bandwidth, but you must confirm the upload finished, through a storage event or callback.", r: [L.azValet] },
+    { id: "chunked-upload", n: "Chunked upload", o: "Split a large file into parts, upload them in parallel, resume after failure.", w: "Dropbox, YouTube.",
+      h: "Each chunk is uploaded and acknowledged separately, then assembled; a failed upload resumes from the last good chunk. Per-chunk hashes enable deduplication.",
+      t: "More bookkeeping for the parts and the final assembly." }
+  ]},
+  { id: "correctness", n: "Correctness patterns", b: "Patterns for money, inventory and shared limits.", c: [
+    { id: "reservation", n: "Reservation with timeout", s: 1, o: "Hold an item briefly while the user completes the purchase.", w: "Ticketing, flash sales, hotel booking.",
+      h: "Mark the seat RESERVED with an expiry using a conditional update; payment confirms it, and an expired hold is released automatically.",
+      t: "Holds reduce availability for others, so keep them short, around 5–10 minutes." },
+    { id: "ledger", n: "Double-entry ledger", s: 1, k: "Double-entry bookkeeping", o: "Every transaction is debits and credits that sum to zero; entries are append-only.", w: "Wallets, payments, accounting.",
+      h: "Moving money writes at least two entries in one transaction; balances are sums of entries, and mistakes are fixed with reversing entries, never edits.",
+      t: "More rows and careful design, in return for full auditability.", r: [L.mt] },
+    { id: "distributed-rate-limiter", n: "Distributed rate limiter", o: "A token bucket shared by all API servers.", w: "API gateways.",
+      h: "Counters live in Redis and are updated atomically (a Lua script, or INCR with an expiry), so every server enforces the same limit.",
+      t: "A network call per request; a local pre-check can reduce it.", r: [L.rlVid, L.azRate] },
+    { id: "leaderboard", n: "Leaderboard", o: "A sorted set plus periodic snapshots.", w: "Gaming, contests.",
+      h: "Live ranks come from a sorted set; snapshots go to a database for history and recovery.",
+      t: "Global boards with millions of players use approximate ranks far from the top.", r: [L.redisZset] },
+    { id: "merge-queue", n: "Merge queue", o: "Changes merge in order, each tested on top of the ones ahead.", w: "CI systems and monorepos.",
+      h: "Approved changes queue up; each is tested speculatively against main plus the changes ahead of it, and merges if green.",
+      t: "Speculative runs cost compute, and a flaky test can block innocent changes.", r: [L.tap] }
+  ]}
+  ]},
+
+{ id: "security", n: "Security", hue: 165, icon: "lock",
+  b: "Who can call what, and keeping data safe on the wire and on disk.",
+  r: [L.owasp, L.oauth, L.primer],
+  g: [
+  { id: "identity", n: "Identity & access", b: "Proving who someone is and deciding what they may do.", c: [
+    { id: "authn-authz", n: "Authentication vs authorisation", s: 1, k: "Authentication", o: "Who you are vs what you’re allowed to do.", w: "Any API design.",
+      h: "Authentication verifies identity (password, SSO, token). Authorisation checks permissions on every request, usually close to the data.",
+      t: "Centralise authentication; keep authorisation checks where the resource lives." },
+    { id: "oauth-oidc", n: "OAuth 2.0 and OpenID Connect", s: 1, k: "OAuth", o: "OAuth grants an app access on a user’s behalf; OIDC adds login.", w: "“Sign in with Google”, third-party access.",
+      h: "The user approves at the identity provider; the app receives an access token (and with OIDC an ID token) instead of the password.",
+      t: "Standard and secure, but easy to misconfigure; use PKCE for public clients.", r: [L.oauth] },
+    { id: "jwt", n: "JWT", s: 1, k: "JSON Web Token", o: "A signed token carrying claims that services can verify locally.", w: "Stateless auth between services.",
+      h: "A header, a payload and a signature, base64-encoded; any service with the public key can verify it without calling the auth server.",
+      t: "Hard to revoke before it expires, so keep lifetimes short and use refresh tokens.", r: [L.jwt] },
+    { id: "session-vs-token", n: "Session vs token auth", o: "The server stores the session, or the client holds a signed token.", w: "Web apps vs APIs and mobile.",
+      h: "Session: a random ID in a cookie points to server-side state. Token: the client sends a signed token with each request.",
+      t: "Sessions are easy to revoke but need shared storage; tokens scale easily but revoke poorly." },
+    { id: "rbac", n: "RBAC", k: "Role-based access control", o: "Permissions attached to roles, roles given to users.", w: "Admin tools and internal systems.",
+      h: "On each request, check whether any of the user’s roles grants this action on this resource.",
+      t: "Simple to reason about; very fine-grained rules may need attribute-based access control." }
+  ]},
+  { id: "protection", n: "Protecting data & services", b: "Encryption, service identity and limiting blast radius.", c: [
+    { id: "mtls", n: "mTLS", s: 1, k: "Mutual authentication", o: "Both client and server present certificates.", w: "Service-to-service trust.",
+      h: "Each service has a certificate from an internal authority; a connection succeeds only if both sides verify each other. Service meshes automate this.",
+      t: "Strong identity, but certificate rotation must be automated.", r: [L.cfMtls] },
+    { id: "encryption", n: "Encryption in transit and at rest", s: 1, k: "Encryption", o: "TLS on the network; encrypted disks and databases.", w: "Sensitive data and compliance.",
+      h: "TLS protects data moving between services; storage encryption with keys held in a key management service protects it on disk.",
+      t: "A small performance cost, plus key management to get right." },
+    { id: "secrets", n: "Secrets management", o: "Keys and passwords kept in a vault, not in code.", w: "Every production system.",
+      h: "Services fetch secrets at runtime from a vault (HashiCorp Vault or a cloud secret manager) with access control, audit logs and rotation.",
+      t: "Another critical dependency, so cache secrets carefully." },
+    { id: "least-privilege", n: "Least privilege", k: "Principle of least privilege", o: "Give each component only the access it needs.", w: "Limiting damage from a breach.",
+      h: "Scope service accounts, database users and network rules to exactly what each service uses.",
+      t: "More policies to maintain, but a compromise stays contained." }
+  ]}
+  ]}
+];
+
+/* ---------- Build the tree ---------- */
+const byId = new Map();
+const root = { id: "atlas", kind: "root", name: "All domains", children: [], depth: 0 };
+byId.set(root.id, root);
+let leafTotal = 0;
+DATA.forEach(d => {
+  const dn = { id: "d-" + d.id, kind: "domain", name: d.n, blurb: d.b, hue: d.hue, icon: d.icon, res: d.r || [], parent: root, depth: 1, children: [] };
+  root.children.push(dn); byId.set(dn.id, dn);
+  d.g.forEach(g => {
+    const gn = { id: "g-" + g.id, kind: "group", name: g.n, blurb: g.b, hue: d.hue, icon: d.icon, parent: dn, depth: 2, children: [] };
+    dn.children.push(gn); byId.set(gn.id, gn);
+    g.c.forEach(c => {
+      const ln = { id: c.id, kind: "leaf", name: c.n, core: !!c.s, one: c.o, when: c.w, how: c.h, trade: c.t, res: c.r || [], wiki: c.k || null, hue: d.hue, parent: gn, depth: 3, children: [] };
+      if (byId.has(ln.id)) console.warn("Duplicate id", ln.id);
+      gn.children.push(ln); byId.set(ln.id, ln); leafTotal++;
+    });
+  });
+});
+
+/* ---------- State ---------- */
+const store = {
+  get(k, d) { try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+};
+const learned = new Set(store.get("sda-learned-v1", []));
+let coreOnly = !!store.get("sda-core-v1", false);
+const activeIdx = new Map();
+let currentId = null;
+const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+const isLeaf = n => n.kind === "leaf";
+function leavesUnder(n) {
+  if (isLeaf(n)) return [n];
+  return n.children.reduce((a, c) => a.concat(leavesUnder(c)), []);
+}
+function visibleLeaves(n) { return leavesUnder(n).filter(l => !coreOnly || l.core); }
+function visibleChildren(n) {
+  if (n.kind === "group") return n.children.filter(l => !coreOnly || l.core);
+  return n.children.filter(c => visibleLeaves(c).length > 0);
+}
+function pathOf(n) { const p = []; let x = n; while (x) { p.unshift(x); x = x.parent; } return p; }
+const esc = s => String(s).replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
+const domStyle = n => n.hue != null ? ' style="--h:' + n.hue + '"' : "";
+
+/* ---------- Elements ---------- */
+const $ = id => document.getElementById(id);
+const view = $("view"), crumbs = $("crumbs"), backBtn = $("backBtn"), live = $("live");
+
+/* ---------- Header bits ---------- */
+function updateProgress() {
+  const n = learned.size;
+  $("progNum").textContent = n + " / " + leafTotal;
+  $("progBar").style.width = (leafTotal ? (n / leafTotal * 100) : 0) + "%";
+  $("brandSub").textContent = leafTotal + " concepts";
+  $("footCount").textContent = leafTotal + " concepts · " + root.children.length + " domains";
+  pal.input.placeholder = "Search " + leafTotal + " concepts, groups and domains";
+}
+function updateSeg() {
+  $("segAll").setAttribute("aria-pressed", String(!coreOnly));
+  $("segCore").setAttribute("aria-pressed", String(coreOnly));
+}
+function renderCrumbs(node) {
+  const p = pathOf(node);
+  crumbs.innerHTML = p.map((n, i) => {
+    const last = i === p.length - 1;
+    const label = n.kind === "root" ? "Atlas" : n.name;
+    return (i ? '<span class="crumb-sep" aria-hidden="true">/</span>' : "") +
+      '<button type="button" class="crumb" data-go="' + esc(n.id) + '"' + (last ? ' aria-current="page"' : "") + ">" + esc(label) + "</button>";
+  }).join("");
+  backBtn.disabled = !node.parent;
+  backBtn.setAttribute("aria-label", node.parent ? "Back to " + (node.parent.kind === "root" ? "all domains" : node.parent.name) : "Back");
+}
+
+/* ---------- Navigation ---------- */
+function go(id) {
+  if (!byId.has(id)) id = "atlas";
+  if (location.hash.slice(1) === id) { route(); return; }
+  location.hash = id;
+}
+function route() {
+  let id = decodeURIComponent(location.hash.slice(1));
+  if (!byId.has(id)) id = "atlas";
+  const node = byId.get(id);
+  const prev = currentId ? byId.get(currentId) : null;
+  if (prev && prev !== node) {
+    // Coming back up: point the ring at the child we came from.
+    let a = prev;
+    while (a && a.parent && a.parent !== node) a = a.parent;
+    if (a && a.parent === node) {
+      const idx = visibleChildren(node).indexOf(a);
+      if (idx >= 0) activeIdx.set(node.id, idx);
+    }
+  }
+  const dir = !prev ? 0 : (node.depth > prev.depth ? 1 : node.depth < prev.depth ? -1 : 0);
+  currentId = id;
+  transition(dir, () => {
+    renderCrumbs(node);
+    if (isLeaf(node)) renderDetail(node); else renderTray(node);
+    document.title = (node.kind === "root" ? "" : node.name + " · ") + "System Design Atlas";
+  });
+}
+function transition(dir, build) {
+  if (reduceMotion || dir === 0 && !view.childElementCount) { build(); return; }
+  view.classList.remove("enter-in", "enter-out");
+  view.classList.add(dir >= 0 ? "leave-in" : "leave-out");
+  setTimeout(() => {
+    view.classList.remove("leave-in", "leave-out");
+    build();
+    void view.offsetWidth;
+    view.classList.add(dir >= 0 ? "enter-in" : "enter-out");
+    window.scrollTo({ top: 0 });
+  }, 190);
+}
+
+/* ---------- Tray (rotating shelf) ---------- */
+let ringState = null;
+
+/* Auto-rotate: a continuous clockwise spin (seen from above, cards drift left and new
+   ones arrive from the right) whenever nobody is using the shelf. */
+const AUTO_IDLE = 2500, AUTO_SPEED = 0.55; // idle ms before spinning; cards per second
+const auto = { enabled: store.get("sda-auto-v1", !reduceMotion), lastInteract: 0, lastStep: 0, hover: false, drifting: false, lastT: 0 };
+function stopDrift() {
+  const s = ringState;
+  if (!auto.drifting) return;
+  auto.drifting = false;
+  if (s) { s.ring.classList.remove("dragging"); s.active = Math.round(s.active); activeIdx.set(s.node.id, mod(s.active, s.kids.length)); layoutRing(); }
+}
+function touch() { auto.lastInteract = Date.now(); stopDrift(); }
+function updateAutoBtn() {
+  const b = $("autoBtn"); if (!b) return;
+  b.setAttribute("aria-pressed", String(auto.enabled));
+  b.innerHTML = auto.enabled
+    ? '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6.5" y="5" width="4" height="14" rx="1.2"/><rect x="13.5" y="5" width="4" height="14" rx="1.2"/></svg>Pause rotation'
+    : '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"/></svg>Auto-rotate';
+  b.classList.toggle("is-on", auto.enabled);
+}
+function autoFrame(t) {
+  const s = ringState;
+  const dt = auto.lastT ? Math.min(0.05, (t - auto.lastT) / 1000) : 0;
+  auto.lastT = t;
+  const canSpin = s && s.ring.isConnected && auto.enabled && !auto.hover && !s.dragging && !document.hidden &&
+    pal.wrap.hidden && Date.now() - auto.lastInteract >= AUTO_IDLE;
+  if (canSpin) {
+    if (!auto.drifting) { auto.drifting = true; s.ring.classList.add("dragging"); }
+    s.active += AUTO_SPEED * dt;
+    layoutRing();
+  } else if (auto.drifting) {
+    stopDrift();
+  }
+  requestAnimationFrame(autoFrame);
+}
+requestAnimationFrame(autoFrame);
+
+function cardHTML(n, i) {
+  if (isLeaf(n)) {
+    const isL = learned.has(n.id);
+    return '<button type="button" class="card dom" data-i="' + i + '"' + domStyle(n) + ' aria-label="' + esc(n.name + (n.core ? ", core concept" : "") + (isL ? ", learned" : "")) + '">' +
+      '<div class="card-top">' + (n.core ? '<span class="chip star">★ Core</span>' : '<span class="kicker">Concept</span>') +
+      (isL ? '<span class="chip learned">' + CHECK + 'Learned</span>' : "") + "</div>" +
+      '<h3 class="card-title">' + esc(n.name) + "</h3>" +
+      '<p class="card-blurb">' + esc(n.one) + "</p>" +
+      '<div class="card-foot"><div class="card-when"><span class="label">Say it when</span><p>' + esc(n.when) + "</p></div>" +
+      '<div class="card-cta"><span>Open concept</span><span aria-hidden="true">→</span></div></div></button>';
+  }
+  const leaves = visibleLeaves(n), all = leaves.length;
+  const core = leaves.filter(l => l.core).length;
+  const done = leaves.filter(l => learned.has(l.id)).length;
+  const kids = visibleChildren(n).length;
+  const kidWord = n.kind === "domain" ? (kids === 1 ? "group" : "groups") : (kids === 1 ? "concept" : "concepts");
+  const meta = n.kind === "domain"
+    ? kids + " " + kidWord + " · " + all + " concepts" + (coreOnly ? "" : " · " + core + " core")
+    : kids + " " + kidWord + (coreOnly ? "" : " · " + core + " core");
+  return '<button type="button" class="card dom" data-i="' + i + '"' + domStyle(n) + ' aria-label="' + esc(n.name + ", " + meta) + '">' +
+    '<div class="card-top"><span class="tile">' + svg(n.icon) + '</span><span class="kicker">' + (n.kind === "domain" ? "Domain" : "Group") + "</span></div>" +
+    '<h3 class="card-title">' + esc(n.name) + "</h3>" +
+    '<p class="card-blurb">' + esc(n.blurb || "") + "</p>" +
+    '<div class="card-foot"><div class="card-meta">' + esc(meta) + "</div>" +
+    '<div class="bar" aria-hidden="true"><i style="width:' + (all ? done / all * 100 : 0) + '%"></i></div>' +
+    '<div class="card-cta"><span>' + done + " of " + all + ' learned</span><span aria-hidden="true">Open →</span></div></div></button>';
+}
+
+function renderTray(node) {
+  const kids = visibleChildren(node);
+  const leaves = visibleLeaves(node);
+  const learnedHere = leaves.filter(l => learned.has(l.id)).length;
+  const eyebrow = node.kind === "root" ? "System design vocabulary" : node.kind === "domain" ? "Domain" : "Group · " + node.parent.name;
+  const childWord = node.kind === "group" ? "Concepts" : node.kind === "domain" ? "Groups" : "Domains";
+  const blurb = node.kind === "root"
+    ? "The most-used system design concepts and patterns, grouped by what they’re about. Pick a domain, drill into a group, then open a concept to learn it."
+    : node.blurb;
+
+  let html = '<section class="dom"' + domStyle(node) + ">" +
+    '<div class="level-head"><div><div class="eyebrow">' + esc(eyebrow) + '</div><h1 class="level-title">' + esc(node.kind === "root" ? "System Design Atlas" : node.name) + "</h1>" +
+    '<p class="level-blurb">' + esc(blurb) + "</p></div>" +
+    '<div class="level-stats"><div class="stat"><b>' + kids.length + "</b><span>" + childWord + '</span></div><div class="stat"><b>' + leaves.length + '</b><span>Concepts</span></div><div class="stat"><b>' + learnedHere + "</b><span>Learned</span></div></div></div>";
+
+  if (!kids.length) {
+    html += '<div class="empty"><p>No core concepts in this group.</p><button type="button" class="back-btn" id="showAll">Show all concepts</button></div></section>';
+    view.innerHTML = html;
+    const b = $("showAll"); if (b) b.addEventListener("click", () => setCore(false));
+    ringState = null;
+    return;
+  }
+
+  html += '<div class="stage" id="stage" role="region" aria-roledescription="carousel" aria-label="' + esc(childWord) + '">' +
+    '<div class="ring" id="ring">' + kids.map(cardHTML).join("") + "</div>" +
+    '<button type="button" class="nav-arrow prev" id="prevBtn" aria-label="Previous card"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>' +
+    '<button type="button" class="nav-arrow next" id="nextBtn" aria-label="Next card"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg></button>' +
+    "</div>" +
+    '<div class="ring-index"><div class="ticks" id="ticks">' + kids.map((k, i) => '<button type="button" class="tick dom" data-t="' + i + '"' + domStyle(k) + ' aria-label="Show ' + esc(k.name) + '"></button>').join("") + "</div>" +
+    '<div class="ring-row"><div class="ring-caption" id="ringCaption"></div>' +
+    '<button type="button" class="auto-btn" id="autoBtn" aria-pressed="false"></button></div>' +
+    '<div class="hint"><span><span class="kbd">←</span><span class="kbd">→</span>rotate</span><span><span class="kbd">Enter</span>open</span><span><span class="kbd">Esc</span>back</span><span>or drag the shelf</span></div></div></section>';
+  view.innerHTML = html;
+
+  const start = Math.min(activeIdx.get(node.id) || 0, kids.length - 1);
+  ringState = { node, kids, active: start, drag: 0, wrap: kids.length >= 2, dragging: false, cards: Array.from(view.querySelectorAll(".card")), stage: $("stage"), ring: $("ring") };
+  auto.lastInteract = Date.now(); auto.lastStep = Date.now(); auto.hover = false; auto.drifting = false;
+  updateAutoBtn();
+  layoutRing();
+  wireRing();
+}
+
+function ringGeometry() {
+  const st = ringState.stage;
+  const w = st.clientWidth;
+  const cw = parseFloat(getComputedStyle(st).getPropertyValue("--cw")) || 252;
+  const R = Math.max(cw * 1.9, Math.min(cw * 2.4, w * 0.55));
+  return { R, step: 31, cw };
+}
+
+const mod = (a, n) => ((a % n) + n) % n;
+// Offset of card i from the front, taking the shortest way round when the shelf loops.
+function ringOffset(s, i, pos) {
+  const n = s.kids.length;
+  let off = i - pos;
+  // With two cards, keep the other card on the right so rotation always runs clockwise.
+  if (s.wrap) off = n === 2 ? mod(off + 0.5, 2) - 0.5 : mod(off + n / 2, n) - n / 2;
+  return off;
+}
+function frontIndex(s) {
+  const n = s.kids.length, p = Math.round(s.active - s.drag);
+  return s.wrap ? mod(p, n) : Math.max(0, Math.min(n - 1, p));
+}
+
+function layoutRing() {
+  const s = ringState; if (!s) return;
+  const { R, step } = ringGeometry();
+  const pos = s.active - s.drag;
+  s.ring.style.transform = "translateZ(" + (-R) + "px)";
+  const n = s.kids.length;
+  const dpos = s._lastPos === undefined ? 0 : pos - s._lastPos;
+  s._lastPos = pos;
+  s.cards.forEach((el, i) => {
+    const off = ringOffset(s, i, pos);
+    const ab = Math.abs(off);
+    const hidden = ab > 2.6;
+    // A card that wraps from one end of the shelf to the other would sweep across the
+    // front. Detect that (it moved differently from the shelf), hide it, move it, then
+    // let it fade in at its new place.
+    const jumped = el._off !== undefined && Math.abs((off - el._off) + dpos) > 0.5;
+    el._off = off;
+    if (jumped) {
+      el.style.transition = "none";
+      el.style.opacity = "0";
+      el.style.transform = "translate(-50%, -50%) rotateY(" + (off * step) + "deg) translateZ(" + R + "px)";
+      void el.offsetWidth;
+      el.style.transition = "";
+    }
+    el.style.transform = "translate(-50%, -50%) rotateY(" + (off * step) + "deg) translateZ(" + R + "px)";
+    // On a looping shelf, fade cards out as they near the wrap point so nothing pops.
+    let edge = 1;
+    if (s.wrap) {
+      const lo = n === 2 ? -0.5 : -n / 2, hi = lo + n;
+      edge = Math.max(0, Math.min(1, Math.min(off - lo, hi - off) / 0.5));
+    }
+    el.style.opacity = hidden ? "0" : String(Math.max(0, 1 - ab * 0.27) * edge);
+    el.style.zIndex = String(100 - Math.round(ab * 10));
+    el.style.pointerEvents = hidden ? "none" : "auto";
+    const front = ab < 0.5;
+    el.classList.toggle("is-front", front);
+    el.tabIndex = front ? 0 : -1;
+    el.setAttribute("aria-hidden", hidden ? "true" : "false");
+  });
+  const a = frontIndex(s);
+  view.querySelectorAll(".tick").forEach((t, i) => t.setAttribute("aria-current", i === a ? "true" : "false"));
+  const k = s.kids[a];
+  $("ringCaption").innerHTML = '<span class="pos">' + (a + 1) + " / " + s.kids.length + "</span><b>" + esc(k.name) + "</b>";
+  $("prevBtn").disabled = !s.wrap && a <= 0;
+  $("nextBtn").disabled = !s.wrap && a >= s.kids.length - 1;
+}
+
+// i is an absolute ring position; on a looping shelf it may run past either end.
+function setActive(i, announce) {
+  const s = ringState; if (!s) return;
+  const n = s.kids.length;
+  if (!s.wrap) i = Math.max(0, Math.min(n - 1, i));
+  s.active = i; s.drag = 0;
+  const idx = mod(i, n);
+  activeIdx.set(s.node.id, idx);
+  layoutRing();
+  if (announce) live.textContent = "Card " + (idx + 1) + " of " + n + ": " + s.kids[idx].name;
+}
+// Rotate the shortest way to card index i.
+function rotateTo(i, announce) {
+  const s = ringState; if (!s) return;
+  const n = s.kids.length, cur = mod(s.active, n);
+  let d = i - cur;
+  if (s.wrap) d = mod(d + n / 2, n) - n / 2;
+  setActive(s.active + d, announce);
+}
+
+function openIndex(i) {
+  const s = ringState; if (!s) return;
+  touch();
+  const target = s.kids[i];
+  if (i !== mod(s.active, s.kids.length)) {
+    rotateTo(i);
+    setTimeout(() => go(target.id), reduceMotion ? 0 : 380);
+  } else {
+    go(target.id);
+  }
+}
+
+function wireRing() {
+  const s = ringState;
+  $("prevBtn").addEventListener("click", () => { touch(); setActive(s.active - 1, true); });
+  $("nextBtn").addEventListener("click", () => { touch(); setActive(s.active + 1, true); });
+  view.querySelectorAll(".tick").forEach(t => t.addEventListener("click", () => { touch(); rotateTo(+t.dataset.t, true); }));
+  $("autoBtn").addEventListener("click", () => {
+    auto.enabled = !auto.enabled; store.set("sda-auto-v1", auto.enabled);
+    auto.lastInteract = Date.now() - AUTO_IDLE + 1200; auto.lastStep = 0;
+    updateAutoBtn();
+    live.textContent = auto.enabled ? "Auto-rotate on" : "Auto-rotate paused";
+  });
+  // Only real mouse movement over the shelf counts as activity; a resting cursor
+  // doesn't stop the spin.
+  let lastMX = null, lastMY = null;
+  s.stage.addEventListener("pointermove", e => {
+    if (e.pointerType !== "mouse") return;
+    if (lastMX !== null && (Math.abs(e.clientX - lastMX) > 2 || Math.abs(e.clientY - lastMY) > 2)) touch();
+    lastMX = e.clientX; lastMY = e.clientY;
+  });
+  s.cards.forEach(el => {
+    el.addEventListener("focus", () => { if (el.matches(":focus-visible")) touch(); });
+  });
+
+  let startX = 0, startY = 0, moved = false, down = false, pid = null;
+  const { cw } = ringGeometry();
+  const perCard = Math.max(110, cw * 0.75);
+  s.stage.addEventListener("pointerdown", e => {
+    if (e.button !== 0 || e.target.closest(".nav-arrow")) return;
+    touch();
+    down = true; moved = false; startX = e.clientX; startY = e.clientY; pid = e.pointerId;
+  });
+  s.stage.addEventListener("pointermove", e => {
+    if (!down || e.pointerId !== pid) return;
+    const dx = e.clientX - startX, dy = e.clientY - startY;
+    if (!moved && Math.abs(dx) > 6 && Math.abs(dx) > Math.abs(dy)) {
+      moved = true; s.dragging = true; touch(); s.ring.classList.add("dragging");
+      try { s.stage.setPointerCapture(pid); } catch (err) {}
+    }
+    if (moved) {
+      // Clamp so the shelf can only overshoot either end by a little.
+      s.drag = s.wrap ? dx / perCard : Math.max(s.active - (s.kids.length - 1) - 0.4, Math.min(s.active + 0.4, dx / perCard));
+      layoutRing();
+    }
+  });
+  const end = e => {
+    if (!down) return;
+    down = false;
+    if (moved) {
+      s.dragging = false; touch();
+      s.ring.classList.remove("dragging");
+      const target = Math.round(s.active - s.drag);
+      setActive(target, true);
+      try { s.stage.releasePointerCapture(pid); } catch (err) {}
+    }
+  };
+  s.stage.addEventListener("pointerup", end);
+  s.stage.addEventListener("pointercancel", e => { if (moved) { s.dragging = false; s.ring.classList.remove("dragging"); s.drag = 0; layoutRing(); } down = false; });
+
+  s.cards.forEach(el => el.addEventListener("click", e => {
+    if (moved) { e.preventDefault(); moved = false; return; }
+    openIndex(+el.dataset.i);
+  }));
+
+  let wheelLock = 0;
+  s.stage.addEventListener("wheel", e => {
+    if (Math.abs(e.deltaX) < Math.abs(e.deltaY) || Math.abs(e.deltaX) < 12) return;
+    e.preventDefault();
+    const now = Date.now();
+    if (now - wheelLock < 320) return;
+    wheelLock = now;
+    touch();
+    setActive(s.active + (e.deltaX > 0 ? 1 : -1), true);
+  }, { passive: false });
+}
+
+/* ---------- Detail page ---------- */
+function resourceRows(list) {
+  return list.map(r => {
+    const t = r[0], label = { v: "Video", a: "Article", d: "Docs", p: "Paper", i: "Interactive", s: "Search" }[t] || "Link";
+    let host = ""; try { host = new URL(r[2]).hostname.replace(/^www\./, ""); } catch (e) {}
+    return '<li><a class="res" href="' + esc(r[2]) + '" target="_blank" rel="noopener noreferrer"><span class="res-type t-' + t + '">' + label + '</span><span class="res-body"><span class="res-title">' + esc(r[1]) + '</span><span class="res-host">' + esc(host) + "</span></span>" + ARROW_OUT + "</a></li>";
+  }).join("");
+}
+
+function renderDetail(n) {
+  ringState = null;
+  const group = n.parent, domain = group.parent;
+  const sibs = visibleChildren(group).length ? visibleChildren(group) : group.children;
+  let idx = sibs.indexOf(n);
+  const all = group.children;
+  const prevN = idx > 0 ? sibs[idx - 1] : null;
+  const nextN = idx >= 0 && idx < sibs.length - 1 ? sibs[idx + 1] : null;
+  const related = all.filter(x => x !== n);
+  const isL = learned.has(n.id);
+
+  const searchLinks = [["s", "YouTube: “" + n.name + " system design”", "https://www.youtube.com/results?search_query=" + encodeURIComponent(n.name + " system design explained")]];
+  if (n.wiki) searchLinks.push(["s", "Wikipedia: " + n.wiki, "https://en.wikipedia.org/w/index.php?title=Special:Search&go=Go&search=" + encodeURIComponent(n.wiki)]);
+
+  view.innerHTML =
+    '<article class="detail dom"' + domStyle(n) + ">" +
+      '<div class="detail-main">' +
+        '<div class="eyebrow">' + esc(domain.name + " · " + group.name) + "</div>" +
+        '<h1 class="detail-title">' + esc(n.name) + "</h1>" +
+        '<div class="detail-chips">' + (n.core ? '<span class="chip star">★ Core concept</span>' : '<span class="chip dom-chip">Good to know</span>') +
+          (isL ? '<span class="chip learned">' + CHECK + "Learned</span>" : "") + "</div>" +
+        '<p class="lead" style="margin-top:18px">' + esc(n.one) + "</p>" +
+        '<div class="callout"><span class="label">Say it when</span><p>' + esc(n.when) + "</p></div>" +
+        '<div class="section"><h2>How it works</h2><p>' + esc(n.how) + "</p></div>" +
+        '<div class="section"><h2>Trade-off</h2><p>' + esc(n.trade) + "</p></div>" +
+        (related.length ? '<div class="section"><h2>Related in ' + esc(group.name) + '</h2><div class="related">' +
+          related.map(r => '<button type="button" class="rel" data-go="' + esc(r.id) + '">' + (r.core ? '<span class="dot" aria-hidden="true"></span>' : "") + esc(r.name) + "</button>").join("") + "</div></div>" : "") +
+        '<div class="pager">' +
+          '<button type="button" class="prev" ' + (prevN ? 'data-go="' + esc(prevN.id) + '"' : "disabled") + '><span class="label">← Previous</span><span class="name">' + esc(prevN ? prevN.name : "Start of group") + "</span></button>" +
+          '<button type="button" class="next" ' + (nextN ? 'data-go="' + esc(nextN.id) + '"' : "disabled") + '><span class="label">Next →</span><span class="name">' + esc(nextN ? nextN.name : "End of group") + "</span></button>" +
+        "</div>" +
+      "</div>" +
+      '<aside class="aside">' +
+        '<div class="panel"><h3>Your progress</h3><p class="sub">Mark it once you can explain it out loud without notes.</p>' +
+          '<button type="button" class="learn-btn" id="learnBtn" aria-pressed="' + isL + '">' + (isL ? CHECK + "Learned" : "Mark as learned") + "</button></div>" +
+        '<div class="panel"><h3>Learn more</h3><p class="sub">Videos, articles and docs, opened in a new tab.</p>' +
+          (n.res.length ? '<div class="res-group">For this concept</div><ul class="res-list">' + resourceRows(n.res) + "</ul>" : "") +
+          '<div class="res-group">Search</div><ul class="res-list">' + resourceRows(searchLinks) + "</ul>" +
+          '<div class="res-group">Go deeper on ' + esc(domain.name) + '</div><ul class="res-list">' + resourceRows(domain.res) + "</ul>" +
+        "</div>" +
+      "</aside>" +
+    "</article>";
+
+  $("learnBtn").addEventListener("click", () => {
+    if (learned.has(n.id)) learned.delete(n.id); else learned.add(n.id);
+    store.set("sda-learned-v1", Array.from(learned));
+    updateProgress();
+    const nowL = learned.has(n.id);
+    const b = $("learnBtn");
+    b.setAttribute("aria-pressed", String(nowL));
+    b.innerHTML = nowL ? CHECK + "Learned" : "Mark as learned";
+    const chips = view.querySelector(".detail-chips");
+    chips.innerHTML = (n.core ? '<span class="chip star">★ Core concept</span>' : '<span class="chip dom-chip">Good to know</span>') + (nowL ? '<span class="chip learned">' + CHECK + "Learned</span>" : "");
+    live.textContent = nowL ? n.name + " marked as learned" : n.name + " unmarked";
+  });
+}
+
+/* ---------- Search palette ---------- */
+const pal = { wrap: $("paletteWrap"), input: $("paletteInput"), list: $("paletteList"), items: [], sel: 0, lastFocus: null };
+const searchIndex = Array.from(byId.values()).filter(n => n.kind !== "root").map(n => ({
+  n, hay: (n.name + " " + (n.one || n.blurb || "") + " " + (n.when || "")).toLowerCase(),
+  name: n.name.toLowerCase(),
+  path: pathOf(n).slice(1, -1).map(x => x.name).join(" › ")
+}));
+function openPalette() {
+  pal.lastFocus = document.activeElement;
+  pal.wrap.hidden = false;
+  pal.input.value = "";
+  filterPalette();
+  setTimeout(() => pal.input.focus(), 0);
+}
+function closePalette() {
+  pal.wrap.hidden = true;
+  if (pal.lastFocus && pal.lastFocus.focus) pal.lastFocus.focus();
+}
+function filterPalette() {
+  const q = pal.input.value.trim().toLowerCase();
+  let res;
+  if (!q) {
+    res = searchIndex.filter(x => x.n.kind === "leaf" && x.n.core).slice(0, 12);
+  } else {
+    const toks = q.split(/\s+/);
+    res = searchIndex.filter(x => toks.every(t => x.hay.includes(t)))
+      .map(x => ({ x, score: (x.name.startsWith(q) ? 0 : x.name.includes(q) ? 1 : 2) + (x.n.kind === "leaf" ? 0 : 0.5) }))
+      .sort((a, b) => a.score - b.score || a.x.n.name.localeCompare(b.x.n.name))
+      .slice(0, 40).map(o => o.x);
+  }
+  pal.items = res; pal.sel = 0;
+  if (!res.length) {
+    pal.list.innerHTML = '<li class="p-empty">No concepts match “' + esc(pal.input.value) + "”.</li>";
+    return;
+  }
+  pal.list.innerHTML = (q ? "" : '<li class="res-group" role="presentation">Core concepts</li>') + res.map((x, i) =>
+    '<li class="p-item dom" role="option" id="opt-' + i + '" data-k="' + i + '" aria-selected="' + (i === 0) + '"' + domStyle(x.n) + '>' +
+    '<span class="p-dot" aria-hidden="true"></span><span style="min-width:0"><span class="p-name">' + (x.n.core ? "★ " : "") + esc(x.n.name) + '</span><span class="p-path">' + esc(x.path || "Domain") + "</span></span>" +
+    '<span class="p-kind">' + (x.n.kind === "leaf" ? "Concept" : x.n.kind === "group" ? "Group" : "Domain") + "</span></li>").join("");
+  pal.input.setAttribute("aria-activedescendant", "opt-0");
+}
+function movePalette(d) {
+  if (!pal.items.length) return;
+  pal.sel = (pal.sel + d + pal.items.length) % pal.items.length;
+  pal.list.querySelectorAll(".p-item").forEach((el, i) => el.setAttribute("aria-selected", String(i === pal.sel)));
+  const el = $("opt-" + pal.sel); if (el) el.scrollIntoView({ block: "nearest" });
+  pal.input.setAttribute("aria-activedescendant", "opt-" + pal.sel);
+}
+function pickPalette(i) {
+  const x = pal.items[i]; if (!x) return;
+  pal.wrap.hidden = true;
+  go(x.n.id);
+  setTimeout(() => view.focus({ preventScroll: true }), 450);
+}
+pal.input.addEventListener("input", filterPalette);
+pal.input.addEventListener("keydown", e => {
+  if (e.key === "ArrowDown") { e.preventDefault(); movePalette(1); }
+  else if (e.key === "ArrowUp") { e.preventDefault(); movePalette(-1); }
+  else if (e.key === "Enter") { e.preventDefault(); pickPalette(pal.sel); }
+  else if (e.key === "Escape") { e.preventDefault(); closePalette(); }
+});
+pal.list.addEventListener("click", e => { const it = e.target.closest(".p-item"); if (it) pickPalette(+it.dataset.k); });
+pal.wrap.addEventListener("click", e => { if (e.target === pal.wrap) closePalette(); });
+
+/* ---------- Global wiring ---------- */
+function setCore(v) {
+  coreOnly = v; store.set("sda-core-v1", v); updateSeg();
+  activeIdx.clear();
+  const node = byId.get(currentId) || root;
+  renderCrumbs(node);
+  if (isLeaf(node)) renderDetail(node); else renderTray(node);
+}
+$("segAll").addEventListener("click", () => setCore(false));
+$("segCore").addEventListener("click", () => setCore(true));
+$("brand").addEventListener("click", () => go("atlas"));
+$("searchBtn").addEventListener("click", openPalette);
+backBtn.addEventListener("click", () => { const n = byId.get(currentId); if (n && n.parent) go(n.parent.id); });
+document.addEventListener("click", e => {
+  const g = e.target.closest("[data-go]");
+  if (g && !g.disabled && !g.matches('[aria-current="page"]')) go(g.dataset.go);
+});
+document.addEventListener("keydown", e => {
+  const typing = /^(INPUT|TEXTAREA|SELECT)$/.test((e.target.tagName || "")) || e.target.isContentEditable;
+  if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") { e.preventDefault(); pal.wrap.hidden ? openPalette() : closePalette(); return; }
+  if (!pal.wrap.hidden || typing) return;
+  if (e.key === "/") { e.preventDefault(); openPalette(); return; }
+  const n = byId.get(currentId);
+  if (e.key === "Escape" || e.key === "Backspace") { if (n && n.parent) { e.preventDefault(); go(n.parent.id); } return; }
+  if (ringState && !isLeaf(n)) {
+    if (["ArrowRight", "ArrowLeft", "Home", "End"].includes(e.key)) touch();
+    if (e.key === "ArrowRight") { e.preventDefault(); setActive(ringState.active + 1, true); }
+    else if (e.key === "ArrowLeft") { e.preventDefault(); setActive(ringState.active - 1, true); }
+    else if (e.key === "Home") { e.preventDefault(); rotateTo(0, true); }
+    else if (e.key === "End") { e.preventDefault(); rotateTo(ringState.kids.length - 1, true); }
+    else if (e.key === "Enter" && !(e.target.closest && e.target.closest("button"))) { e.preventDefault(); openIndex(mod(ringState.active, ringState.kids.length)); }
+  }
+});
+let resizeT = 0;
+window.addEventListener("resize", () => { clearTimeout(resizeT); resizeT = setTimeout(layoutRing, 80); });
+window.addEventListener("hashchange", route);
+
+updateProgress();
+updateSeg();
+route();
+})();
+</script>
+
+</body>
+</html>
