@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="Interactive flashcards for 143 system design concepts and patterns, grouped by domain, with learning resources.">
+<meta name="description" content="Interactive flashcards for 143 system design concepts and patterns, grouped by topic, each with one recommended video.">
 <title>System Design Atlas</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -340,6 +340,118 @@ a { color: var(--accent); }
 .res-group { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); margin: 12px 10px 4px; }
 .note { font-size: 12px; color: var(--ink-3); margin: 10px 10px 0; }
 
+/* Topic cards on the shelf */
+.card-list { margin: 0; color: var(--ink-2); font-size: 13px; line-height: 1.55; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; flex-shrink: 1; min-height: 0; }
+.video-badge {
+  align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; max-width: 100%;
+  padding: 4px 10px 4px 8px; border-radius: 999px; background: var(--c-soft); color: var(--c);
+  font-size: 12px; font-weight: 600; white-space: nowrap; overflow: hidden;
+}
+.video-badge span { overflow: hidden; text-overflow: ellipsis; }
+.video-badge svg { width: 12px; height: 12px; flex: none; }
+
+/* Topic page: the recommended video */
+.learn-hero {
+  margin-top: 22px; display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 22px; align-items: center;
+  padding: 18px; border-radius: 20px; border: 1.5px solid var(--c-line);
+  background: linear-gradient(115deg, var(--c-soft), transparent 62%), var(--surface);
+  box-shadow: var(--shadow-front);
+}
+.learn-thumb {
+  position: relative; display: grid; place-items: center; aspect-ratio: 16 / 9; max-width: 100%;
+  border-radius: 14px; text-decoration: none; overflow: hidden;
+  background: radial-gradient(120% 90% at 20% 15%, hsl(var(--h) 85% 72% / .55), transparent 55%),
+              linear-gradient(140deg, hsl(var(--h) 70% 46%), hsl(calc(var(--h) + 28) 65% 28%));
+}
+.learn-thumb .play {
+  width: 58px; height: 58px; border-radius: 50%; display: grid; place-items: center;
+  background: #FFFFFF; color: hsl(var(--h) 70% 40%); box-shadow: 0 10px 30px rgba(0, 0, 0, .3);
+  transition: transform .2s var(--ease);
+}
+.learn-thumb .play svg { width: 26px; height: 26px; margin-left: 3px; }
+.learn-thumb:hover .play { transform: scale(1.08); }
+.learn-thumb .len { position: absolute; right: 8px; bottom: 8px; font-family: var(--font-mono); font-size: 11.5px; color: #FFFFFF; background: rgba(0, 0, 0, .72); padding: 2px 6px; border-radius: 5px; }
+.learn-body { min-width: 0; }
+.learn-eyebrow { display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--c); font-weight: 500; }
+.learn-eyebrow svg { width: 11px; height: 11px; }
+.learn-title { font-family: var(--font-display); font-size: 22px; line-height: 1.2; font-weight: 650; letter-spacing: -.015em; margin: 6px 0 4px; text-wrap: balance; }
+.learn-title a { color: var(--ink); text-decoration: none; }
+.learn-title a:hover { text-decoration: underline; text-underline-offset: 3px; }
+.learn-meta { font-size: 13.5px; color: var(--ink-2); }
+.learn-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
+.watch-btn {
+  display: inline-flex; align-items: center; gap: 8px; height: 42px; padding: 0 18px 0 14px; border-radius: 11px;
+  background: var(--c); color: var(--accent-ink); font-weight: 600; font-size: 14.5px; text-decoration: none;
+  box-shadow: 0 8px 20px -8px hsl(var(--h) var(--dom-s) var(--dom-l) / .7); transition: filter .15s, transform .15s;
+}
+.watch-btn:hover { filter: brightness(1.07); transform: translateY(-1px); }
+.watch-btn svg { width: 16px; height: 16px; }
+.read-btn {
+  display: inline-flex; align-items: center; gap: 8px; min-height: 42px; padding: 6px 14px; border-radius: 11px; max-width: 100%;
+  border: 1px solid var(--line-2); background: var(--surface); color: var(--ink); font-size: 13.5px; font-weight: 500; text-decoration: none;
+  transition: border-color .15s;
+}
+.read-btn:hover { border-color: var(--c-line); }
+.read-btn svg { width: 14px; height: 14px; color: var(--ink-3); flex: none; }
+.read-k { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); }
+.learn-also { margin-top: 12px; font-size: 13px; color: var(--ink-3); }
+.learn-also a { color: var(--ink-2); }
+
+/* Topic page: concepts side by side with their descriptions */
+.clist-head {
+  display: grid; grid-template-columns: minmax(190px, 270px) minmax(0, 1fr) auto; gap: 20px; align-items: center;
+  margin-top: 30px; padding: 0 16px 8px; font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3);
+}
+.expand-all { border: 1px solid var(--line); background: var(--surface); border-radius: 8px; padding: 4px 10px; font-family: var(--font-body); font-size: 12px; letter-spacing: 0; text-transform: none; color: var(--ink-2); cursor: pointer; }
+.expand-all:hover { border-color: var(--line-2); color: var(--ink); }
+.clist { list-style: none; margin: 0; padding: 0; border: 1px solid var(--line); border-radius: 16px; background: var(--surface); overflow: hidden; }
+.crow {
+  display: grid; grid-template-columns: minmax(190px, 270px) minmax(0, 1fr) 36px; gap: 20px; align-items: start;
+  padding: 16px; border-top: 1px solid var(--line); transition: background .2s;
+}
+.crow:first-child { border-top: 0; }
+.crow:hover, .crow.is-open { background: var(--surface-2); }
+.crow.flash { animation: flash 1.6s ease; }
+@keyframes flash { 0%, 30% { background: var(--c-soft); } 100% { background: var(--surface-2); } }
+.crow-term { display: flex; gap: 12px; align-items: flex-start; min-width: 0; }
+.crow-name { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; min-width: 0; }
+.crow-name .nm { font-family: var(--font-display); font-weight: 600; font-size: 16.5px; line-height: 1.3; letter-spacing: -.01em; }
+.chip.sm { height: 20px; padding: 0 7px; font-size: 11px; }
+.tick-box {
+  flex: none; width: 22px; height: 22px; margin-top: 1px; border-radius: 7px; border: 1.5px solid var(--line-2); background: var(--surface);
+  display: grid; place-items: center; cursor: pointer; color: transparent; transition: background .15s, border-color .15s, color .15s;
+}
+.tick-box:hover { border-color: var(--good); }
+.tick-box svg { width: 14px; height: 14px; }
+.tick-box[aria-pressed="true"] { background: var(--good); border-color: var(--good); color: var(--surface); }
+.crow.is-learned .nm { color: var(--ink-2); }
+.crow-desc { min-width: 0; cursor: pointer; }
+.crow-desc .one { margin: 0; font-size: 15px; color: var(--ink); line-height: 1.5; }
+.crow-desc .when { margin: 6px 0 0; font-size: 13.5px; color: var(--ink-2); }
+.crow-desc .when .label { margin-right: 6px; color: var(--c); }
+.more { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--line-2); }
+.more p { margin: 4px 0 0; font-size: 14px; color: var(--ink-2); line-height: 1.55; }
+.expand {
+  width: 32px; height: 32px; border-radius: 9px; border: 1px solid var(--line); background: var(--surface); color: var(--ink-3);
+  display: grid; place-items: center; cursor: pointer; transition: transform .25s var(--ease), border-color .15s, color .15s;
+}
+.expand:hover { border-color: var(--line-2); color: var(--ink); }
+.expand svg { width: 16px; height: 16px; }
+.expand[aria-expanded="true"] { transform: rotate(180deg); }
+.topic-page .pager { max-width: none; }
+
+@media (max-width: 760px) {
+  .learn-hero { grid-template-columns: minmax(0, 1fr); gap: 14px; padding: 14px; }
+  .learn-title { font-size: 19px; }
+  .clist-head { grid-template-columns: minmax(0, 1fr) auto; }
+  .clist-head span:nth-child(2) { display: none; }
+  .crow { grid-template-columns: minmax(0, 1fr) 32px; gap: 10px 12px; padding: 14px; }
+  .crow-term { grid-column: 1; }
+  .crow-desc { grid-column: 1 / -1; grid-row: 2; padding-left: 34px; }
+  .expand { grid-column: 2; grid-row: 1; }
+  .more { grid-template-columns: minmax(0, 1fr); }
+}
+
 /* Search palette */
 .palette-wrap { position: fixed; inset: 0; z-index: 100; background: var(--scrim); display: flex; justify-content: center; align-items: flex-start; padding: calc(env(safe-area-inset-top, 0px) + 10vh) max(16px, env(safe-area-inset-right, 0px)) 16px max(16px, env(safe-area-inset-left, 0px)); }
 .palette { width: min(640px, 100%); background: var(--surface); border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow-front); overflow: hidden; animation: pop .18s var(--ease); }
@@ -373,6 +485,8 @@ a { color: var(--accent); }
   .search-btn { flex: none; width: 38px; padding: 0; justify-content: center; margin-left: auto; }
   .brand-name { font-size: 16px; }
   .stage { --cw: 228px; --ch: 336px; height: 430px; }
+  .toolbar { row-gap: 10px; }
+  .crumbs { order: 3; flex-basis: 100%; }
   .card { padding: 18px; gap: 10px; }
   .card-title { font-size: 20px; }
   .card-blurb { -webkit-line-clamp: 3; }
@@ -430,7 +544,7 @@ a { color: var(--accent); }
   <main class="view" id="view" tabindex="-1"></main>
 
   <footer class="footer">
-    <span>Links labelled <b>Search</b> open a YouTube or Wikipedia search for the term. Learned progress is saved in this browser only.</span>
+    <span>Each topic links one recommended video, picked from well-known teachers such as ByteByteGo, Hello Interview, Martin Kleppmann and Gaurav Sen. Learned progress is saved in this browser only.</span>
     <span id="footCount"></span>
   </footer>
 </div>
@@ -441,7 +555,7 @@ a { color: var(--accent); }
   <div class="palette" role="dialog" aria-modal="true" aria-label="Search concepts">
     <div class="palette-input">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
-      <input id="paletteInput" type="text" placeholder="Search 143 concepts, groups and domains" autocomplete="off" spellcheck="false" aria-controls="paletteList">
+      <input id="paletteInput" type="text" placeholder="Search 143 concepts, topics and domains" autocomplete="off" spellcheck="false" aria-controls="paletteList">
       <span class="kbd">Esc</span>
     </div>
     <ul class="palette-list" id="paletteList" role="listbox" aria-label="Results"></ul>
@@ -1125,21 +1239,60 @@ const DATA = [
   ]}
 ];
 
-/* ---------- Build the tree ---------- */
+/* ---------- One recommended video per topic (checked: channel, title, length) ---------- */
+const V = (id, title, channel, len) => ({ id, title, channel, len, url: "https://www.youtube.com/watch?v=" + id });
+const TOPIC = {
+  "measuring": { v: V("FqR5vESuKe0", "Latency Numbers Programmer Should Know", "ByteByteGo", "6:22"), a: L.latnum },
+  "scaling": { v: V("xpDnVSmNFX0", "System Design Basics: Horizontal vs. Vertical Scaling", "Gaurav Sen", "7:56"), also: V("EWS_CIxttVw", "Scalability Simply Explained in 10 Minutes", "ByteByteGo", "9:20"), a: L.primer },
+  "net-foundations": { v: V("AlkDbnbv7dk", "What happens when you type a URL into your browser?", "ByteByteGo", "5:20"), a: L.cfTls },
+  "api-styles": { v: V("4vLxWqE94l4", "Top 6 Most Popular API Architecture Styles", "ByteByteGo", "4:21"), a: L.stripeIdem },
+  "realtime": { v: V("-3rFgUiKKG4", "Real-Time Communication Patterns for System Design Interviews", "Ashish Pratap Singh", "6:11"), a: L.mdnSse },
+  "traffic": { v: V("xo5V9g9joFs", "Proxy vs Reverse Proxy vs Load Balancer", "TechWorld with Nana", "13:19"), also: V("RqfaTIWc3LQ", "Reverse Proxy vs API Gateway vs Load Balancer", "ByteByteGo", "3:06"), a: L.igoLb },
+  "data-models": { v: V("W2Z7fbCLSTw", "7 Database Paradigms", "Fireship", "9:52"), a: L.primer },
+  "transactions": { v: V("5ZjhNTM8XU8", "Transactions: myths, surprises and opportunities", "Martin Kleppmann · Strange Loop", "41:08"), a: L.vlad },
+  "indexing": { v: V("scUtG_6M_lU", "Tree Indexes: B+Trees (CMU Intro to Database Systems)", "CMU Database Group", "1:22:15"), a: L.luke },
+  "replication": { v: V("mBUCF1WGI_I", "Distributed Systems 5.1: Replication", "Martin Kleppmann", "25:21"), also: V("uNxl3BFcKSA", "Distributed Systems 5.2: Quorums", "Martin Kleppmann", "9:36"), a: L.dynamo },
+  "partitioning": { v: V("5faMjKuB9bc", "What is Database Sharding?", "Gaurav Sen", "8:56"), also: V("_1IKwnbscQU", "7 Must-know Strategies to Scale Your Database", "ByteByteGo", "8:42"), a: L.azSharding },
+  "cache-strategies": { v: V("1NngTUYPdpI", "Caching in System Design Interviews", "Hello Interview", "30:14"), a: L.azCacheAside },
+  "freshness": { v: V("dGAgxozNWFE", "Cache Systems Every Developer Should Know", "ByteByteGo", "5:48"), a: L.azCacheAside },
+  "cache-failures": { v: V("wh98s0XhMmQ", "Caching Pitfalls Every Developer Should Know", "ByteByteGo", "6:41"), a: ["a", "Wikipedia — Cache stampede", "https://en.wikipedia.org/wiki/Cache_stampede"] },
+  "consistency": { v: V("gkg-FAEXIkY", "Friendly Intro to the CAP Theorem", "Studying With Alex", "6:47"), a: L.jepsen },
+  "coordination": { v: V("rN6ma561tak", "Distributed Systems 6.1: Consensus", "Martin Kleppmann", "18:15"), a: L.raftViz },
+  "time-ordering": { v: V("x-D8iFU1d-o", "Distributed Systems 4.1: Logical time", "Martin Kleppmann", "24:02"), a: L.kleppmann },
+  "delivery": { v: V("DOFflggE_0Q", "Distributed Transactions Explained: 2 Phase Commit vs Saga Pattern", "Hello Interview", "14:46"), a: L.stripeIdem },
+  "brokers": { v: V("DU8o-OTeoCc", "Kafka System Design Deep Dive", "Hello Interview", "43:31"), also: V("-RDyEFvnTXI", "Apache Kafka Fundamentals You Should Know", "ByteByteGo", "4:55"), a: L.kafka },
+  "msg-failures": { v: V("1ISRd0bS714", "Message Queues in System Design Interviews", "Hello Interview", "26:46"), a: L.azQbll },
+  "event-patterns": { v: V("nH4qjmP2KEE", "Top 7 Most-Used Distributed System Patterns", "ByteByteGo", "6:14"), also: V("5YLpjPmsPCA", "What is the Transactional Outbox Pattern?", "Confluent", "5:31"), a: L.msOutbox },
+  "redundancy": { v: V("Zgy1miPsTNs", "Fail-over and High-Availability (Explained by Example)", "Hussein Nasser", "19:21"), a: L.primer },
+  "resilience": { v: V("RfPNuaj5Ax0", "Top 5 Microservices Resilience Patterns", "ByteMonk", "6:48"), a: L.awsRetry },
+  "overload": { v: V("MIJFyUPG4Z4", "Design a Distributed Rate Limiter", "Hello Interview", "55:58"), also: V("YXkOdWBwqaA", "Rate Limiter System Design: Token Bucket, Leaky Bucket, Scaling", "ByteByteGo", "7:46"), a: L.awsShed },
+  "observability": { v: V("tEylFyxbDLE", "SLIs, SLOs, SLAs, oh my! (class SRE implements DevOps)", "Google Cloud Tech", ""), a: L.sreMon },
+  "releases": { v: V("AWVTKBUnoIg", "Top 5 Most-Used Deployment Strategies", "ByteByteGo", "10:00"), a: L.fowlerFlags },
+  "data-structures": { v: V("fmT5nlEkl3U", "Redis Deep Dive", "Hello Interview", "31:00"), a: L.redisZset },
+  "ids-encoding": { v: V("iUU4O1sWtJA", "Design Bitly: Beginner System Design Interview", "Hello Interview", "59:30"), also: V("HHUi8F_qAXM", "How Does a URL Shortener Work?", "ByteByteGo", "6:44") },
+  "data-flow": { v: V("Qj4-GruzyDU", "Design FB News Feed", "Hello Interview", "26:12"), a: L.azMv },
+  "files": { v: V("_UZ1ngy-kOI", "Design Dropbox or Google Drive", "Hello Interview", "58:08"), a: L.azValet },
+  "correctness": { v: V("fhdPyoO6aXI", "Design Ticketmaster", "Hello Interview", "58:39"), a: L.mt },
+  "identity": { v: V("ZV5yTm4pT8g", "OAuth 2 Explained in Simple Terms", "ByteByteGo", "4:32"), also: V("fyTxwIa-1U0", "Session vs JWT: The Differences You May Not Know", "ByteByteGo", "7:00"), a: L.jwt },
+  "protection": { v: V("b38k2GiLDdc", "What Is Mutual TLS (mTLS), Why Do We Need It, and How Do We Get It?", "DevOps & AI Toolkit", "19:05"), a: L.owasp }
+};
+
+/* ---------- Build the tree: domains → topics → concepts (listed on the topic page) ---------- */
 const byId = new Map();
 const root = { id: "atlas", kind: "root", name: "All domains", children: [], depth: 0 };
 byId.set(root.id, root);
 let leafTotal = 0;
 DATA.forEach(d => {
-  const dn = { id: "d-" + d.id, kind: "domain", name: d.n, blurb: d.b, hue: d.hue, icon: d.icon, res: d.r || [], parent: root, depth: 1, children: [] };
+  const dn = { id: "d-" + d.id, kind: "domain", name: d.n, blurb: d.b, hue: d.hue, icon: d.icon, parent: root, depth: 1, children: [] };
   root.children.push(dn); byId.set(dn.id, dn);
   d.g.forEach(g => {
-    const gn = { id: "g-" + g.id, kind: "group", name: g.n, blurb: g.b, hue: d.hue, icon: d.icon, parent: dn, depth: 2, children: [] };
-    dn.children.push(gn); byId.set(gn.id, gn);
+    const t = TOPIC[g.id] || {};
+    const tn = { id: "g-" + g.id, kind: "topic", name: g.n, blurb: g.b, hue: d.hue, icon: d.icon, video: t.v, also: t.also, article: t.a, parent: dn, depth: 2, children: [], items: [] };
+    dn.children.push(tn); byId.set(tn.id, tn);
     g.c.forEach(c => {
-      const ln = { id: c.id, kind: "leaf", name: c.n, core: !!c.s, one: c.o, when: c.w, how: c.h, trade: c.t, res: c.r || [], wiki: c.k || null, hue: d.hue, parent: gn, depth: 3, children: [] };
-      if (byId.has(ln.id)) console.warn("Duplicate id", ln.id);
-      gn.children.push(ln); byId.set(ln.id, ln); leafTotal++;
+      const cn = { id: c.id, kind: "concept", name: c.n, core: !!c.s, one: c.o, when: c.w, how: c.h, trade: c.t, hue: d.hue, parent: tn, depth: 2 };
+      if (byId.has(cn.id)) console.warn("Duplicate id", cn.id);
+      tn.items.push(cn); byId.set(cn.id, cn); leafTotal++;
     });
   });
 });
@@ -1155,14 +1308,17 @@ const activeIdx = new Map();
 let currentId = null;
 const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-const isLeaf = n => n.kind === "leaf";
+// A "page" node is shown as a full page instead of a shelf: topics, and concepts (their topic's page).
+const isLeaf = n => n.kind === "topic" || n.kind === "concept";
+const pageNode = n => n.kind === "concept" ? n.parent : n;
+const backTarget = n => pageNode(n).parent;
 function leavesUnder(n) {
-  if (isLeaf(n)) return [n];
+  if (n.kind === "concept") return [n];
+  if (n.kind === "topic") return n.items;
   return n.children.reduce((a, c) => a.concat(leavesUnder(c)), []);
 }
 function visibleLeaves(n) { return leavesUnder(n).filter(l => !coreOnly || l.core); }
 function visibleChildren(n) {
-  if (n.kind === "group") return n.children.filter(l => !coreOnly || l.core);
   return n.children.filter(c => visibleLeaves(c).length > 0);
 }
 function pathOf(n) { const p = []; let x = n; while (x) { p.unshift(x); x = x.parent; } return p; }
@@ -1180,13 +1336,14 @@ function updateProgress() {
   $("progBar").style.width = (leafTotal ? (n / leafTotal * 100) : 0) + "%";
   $("brandSub").textContent = leafTotal + " concepts";
   $("footCount").textContent = leafTotal + " concepts · " + root.children.length + " domains";
-  pal.input.placeholder = "Search " + leafTotal + " concepts, groups and domains";
+  pal.input.placeholder = "Search " + leafTotal + " concepts, topics and domains";
 }
 function updateSeg() {
   $("segAll").setAttribute("aria-pressed", String(!coreOnly));
   $("segCore").setAttribute("aria-pressed", String(coreOnly));
 }
 function renderCrumbs(node) {
+  node = pageNode(node);
   const p = pathOf(node);
   crumbs.innerHTML = p.map((n, i) => {
     const last = i === p.length - 1;
@@ -1220,9 +1377,14 @@ function route() {
   }
   const dir = !prev ? 0 : (node.depth > prev.depth ? 1 : node.depth < prev.depth ? -1 : 0);
   currentId = id;
+  // Jumping to another concept on the same topic page: just focus it, no page transition.
+  if (prev && isLeaf(node) && isLeaf(prev) && pageNode(prev) === pageNode(node) && view.querySelector(".topic-page")) {
+    if (node.kind === "concept") focusConcept(node.id, true);
+    return;
+  }
   transition(dir, () => {
     renderCrumbs(node);
-    if (isLeaf(node)) renderDetail(node); else renderTray(node);
+    if (isLeaf(node)) renderTopic(pageNode(node), node.kind === "concept" ? node.id : null); else renderTray(node);
     document.title = (node.kind === "root" ? "" : node.name + " · ") + "System Design Atlas";
   });
 }
@@ -1278,27 +1440,28 @@ function autoFrame(t) {
 }
 requestAnimationFrame(autoFrame);
 
+const PLAY = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"/></svg>';
+
 function cardHTML(n, i) {
-  if (isLeaf(n)) {
-    const isL = learned.has(n.id);
-    return '<button type="button" class="card dom" data-i="' + i + '"' + domStyle(n) + ' aria-label="' + esc(n.name + (n.core ? ", core concept" : "") + (isL ? ", learned" : "")) + '">' +
-      '<div class="card-top">' + (n.core ? '<span class="chip star">★ Core</span>' : '<span class="kicker">Concept</span>') +
-      (isL ? '<span class="chip learned">' + CHECK + 'Learned</span>' : "") + "</div>" +
-      '<h3 class="card-title">' + esc(n.name) + "</h3>" +
-      '<p class="card-blurb">' + esc(n.one) + "</p>" +
-      '<div class="card-foot"><div class="card-when"><span class="label">Say it when</span><p>' + esc(n.when) + "</p></div>" +
-      '<div class="card-cta"><span>Open concept</span><span aria-hidden="true">→</span></div></div></button>';
-  }
   const leaves = visibleLeaves(n), all = leaves.length;
   const core = leaves.filter(l => l.core).length;
   const done = leaves.filter(l => learned.has(l.id)).length;
+  if (n.kind === "topic") {
+    const names = leaves.slice(0, 5).map(l => l.name);
+    const more = leaves.length - names.length;
+    return '<button type="button" class="card dom topic-card" data-i="' + i + '"' + domStyle(n) + ' aria-label="' + esc(n.name + ", " + all + " concepts") + '">' +
+      '<div class="card-top"><span class="tile">' + svg(n.icon) + '</span><span class="kicker">' + all + (all === 1 ? " concept" : " concepts") + "</span></div>" +
+      '<h3 class="card-title">' + esc(n.name) + "</h3>" +
+      '<p class="card-list">' + names.map(esc).join(" · ") + (more > 0 ? " · +" + more + " more" : "") + "</p>" +
+      '<div class="card-foot">' +
+      (n.video ? '<div class="video-badge">' + PLAY + '<span>' + esc(n.video.channel) + (n.video.len ? " · " + esc(n.video.len) : "") + "</span></div>" : "") +
+      '<div class="bar" aria-hidden="true"><i style="width:' + (all ? done / all * 100 : 0) + '%"></i></div>' +
+      '<div class="card-cta"><span>' + done + " of " + all + ' learned</span><span aria-hidden="true">Open →</span></div></div></button>';
+  }
   const kids = visibleChildren(n).length;
-  const kidWord = n.kind === "domain" ? (kids === 1 ? "group" : "groups") : (kids === 1 ? "concept" : "concepts");
-  const meta = n.kind === "domain"
-    ? kids + " " + kidWord + " · " + all + " concepts" + (coreOnly ? "" : " · " + core + " core")
-    : kids + " " + kidWord + (coreOnly ? "" : " · " + core + " core");
+  const meta = kids + (kids === 1 ? " topic" : " topics") + " · " + all + " concepts" + (coreOnly ? "" : " · " + core + " core");
   return '<button type="button" class="card dom" data-i="' + i + '"' + domStyle(n) + ' aria-label="' + esc(n.name + ", " + meta) + '">' +
-    '<div class="card-top"><span class="tile">' + svg(n.icon) + '</span><span class="kicker">' + (n.kind === "domain" ? "Domain" : "Group") + "</span></div>" +
+    '<div class="card-top"><span class="tile">' + svg(n.icon) + '</span><span class="kicker">Domain</span></div>' +
     '<h3 class="card-title">' + esc(n.name) + "</h3>" +
     '<p class="card-blurb">' + esc(n.blurb || "") + "</p>" +
     '<div class="card-foot"><div class="card-meta">' + esc(meta) + "</div>" +
@@ -1310,10 +1473,10 @@ function renderTray(node) {
   const kids = visibleChildren(node);
   const leaves = visibleLeaves(node);
   const learnedHere = leaves.filter(l => learned.has(l.id)).length;
-  const eyebrow = node.kind === "root" ? "System design vocabulary" : node.kind === "domain" ? "Domain" : "Group · " + node.parent.name;
-  const childWord = node.kind === "group" ? "Concepts" : node.kind === "domain" ? "Groups" : "Domains";
+  const eyebrow = node.kind === "root" ? "System design vocabulary" : "Domain";
+  const childWord = node.kind === "domain" ? "Topics" : "Domains";
   const blurb = node.kind === "root"
-    ? "The most-used system design concepts and patterns, grouped by what they’re about. Pick a domain, drill into a group, then open a concept to learn it."
+    ? "The most-used system design concepts and patterns, grouped by what they’re about. Pick a domain, then open a topic to see its concepts side by side with the one video worth watching."
     : node.blurb;
 
   let html = '<section class="dom"' + domStyle(node) + ">" +
@@ -1533,62 +1696,106 @@ function resourceRows(list) {
   }).join("");
 }
 
-function renderDetail(n) {
+function renderTopic(t, focusId) {
   ringState = null;
-  const group = n.parent, domain = group.parent;
-  const sibs = visibleChildren(group).length ? visibleChildren(group) : group.children;
-  let idx = sibs.indexOf(n);
-  const all = group.children;
-  const prevN = idx > 0 ? sibs[idx - 1] : null;
-  const nextN = idx >= 0 && idx < sibs.length - 1 ? sibs[idx + 1] : null;
-  const related = all.filter(x => x !== n);
-  const isL = learned.has(n.id);
+  const domain = t.parent;
+  const items = visibleLeaves(t).length ? visibleLeaves(t) : t.items;
+  const sibs = visibleChildren(domain);
+  const idx = sibs.indexOf(t);
+  const prevT = idx > 0 ? sibs[idx - 1] : null;
+  const nextT = idx >= 0 && idx < sibs.length - 1 ? sibs[idx + 1] : null;
+  const done = items.filter(c => learned.has(c.id)).length;
+  const v = t.video, a = t.article, also = t.also;
+  let host = ""; if (a) { try { host = new URL(a[2]).hostname.replace(/^www\./, ""); } catch (e) {} }
 
-  const searchLinks = [["s", "YouTube: “" + n.name + " system design”", "https://www.youtube.com/results?search_query=" + encodeURIComponent(n.name + " system design explained")]];
-  if (n.wiki) searchLinks.push(["s", "Wikipedia: " + n.wiki, "https://en.wikipedia.org/w/index.php?title=Special:Search&go=Go&search=" + encodeURIComponent(n.wiki)]);
+  const hero = v ?
+    '<section class="learn-hero" aria-label="Learn this topic">' +
+      '<a class="learn-thumb" href="' + esc(v.url) + '" target="_blank" rel="noopener noreferrer" aria-label="Watch ' + esc(v.title) + ' on YouTube">' +
+        '<span class="play">' + PLAY + '</span>' + (v.len ? '<span class="len">' + esc(v.len) + '</span>' : "") + '</a>' +
+      '<div class="learn-body">' +
+        '<div class="learn-eyebrow">' + PLAY + 'Learn this topic · recommended video</div>' +
+        '<h2 class="learn-title"><a href="' + esc(v.url) + '" target="_blank" rel="noopener noreferrer">' + esc(v.title) + '</a></h2>' +
+        '<div class="learn-meta">' + esc(v.channel) + (v.len ? " · " + esc(v.len) : "") + " · YouTube</div>" +
+        '<div class="learn-actions">' +
+          '<a class="watch-btn" href="' + esc(v.url) + '" target="_blank" rel="noopener noreferrer">' + PLAY + 'Watch on YouTube</a>' +
+          (a ? '<a class="read-btn" href="' + esc(a[2]) + '" target="_blank" rel="noopener noreferrer"><span class="read-k">' + ({ v: "Watch", a: "Read", d: "Docs", p: "Paper", i: "Try it" }[a[0]] || "Read") + '</span>' + esc(a[1]) + ARROW_OUT + "</a>" : "") +
+        "</div>" +
+        (also ? '<div class="learn-also">Also good: <a href="' + esc(also.url) + '" target="_blank" rel="noopener noreferrer">' + esc(also.title) + "</a> · " + esc(also.channel) + (also.len ? " · " + esc(also.len) : "") + "</div>" : "") +
+      "</div>" +
+    "</section>" : "";
 
-  view.innerHTML =
-    '<article class="detail dom"' + domStyle(n) + ">" +
-      '<div class="detail-main">' +
-        '<div class="eyebrow">' + esc(domain.name + " · " + group.name) + "</div>" +
-        '<h1 class="detail-title">' + esc(n.name) + "</h1>" +
-        '<div class="detail-chips">' + (n.core ? '<span class="chip star">★ Core concept</span>' : '<span class="chip dom-chip">Good to know</span>') +
-          (isL ? '<span class="chip learned">' + CHECK + "Learned</span>" : "") + "</div>" +
-        '<p class="lead" style="margin-top:18px">' + esc(n.one) + "</p>" +
-        '<div class="callout"><span class="label">Say it when</span><p>' + esc(n.when) + "</p></div>" +
-        '<div class="section"><h2>How it works</h2><p>' + esc(n.how) + "</p></div>" +
-        '<div class="section"><h2>Trade-off</h2><p>' + esc(n.trade) + "</p></div>" +
-        (related.length ? '<div class="section"><h2>Related in ' + esc(group.name) + '</h2><div class="related">' +
-          related.map(r => '<button type="button" class="rel" data-go="' + esc(r.id) + '">' + (r.core ? '<span class="dot" aria-hidden="true"></span>' : "") + esc(r.name) + "</button>").join("") + "</div></div>" : "") +
-        '<div class="pager">' +
-          '<button type="button" class="prev" ' + (prevN ? 'data-go="' + esc(prevN.id) + '"' : "disabled") + '><span class="label">← Previous</span><span class="name">' + esc(prevN ? prevN.name : "Start of group") + "</span></button>" +
-          '<button type="button" class="next" ' + (nextN ? 'data-go="' + esc(nextN.id) + '"' : "disabled") + '><span class="label">Next →</span><span class="name">' + esc(nextN ? nextN.name : "End of group") + "</span></button>" +
+  const rows = items.map(c => {
+    const isL = learned.has(c.id);
+    return '<li class="crow' + (isL ? " is-learned" : "") + '" id="row-' + esc(c.id) + '" data-id="' + esc(c.id) + '">' +
+      '<div class="crow-term">' +
+        '<button type="button" class="tick-box" data-learn="' + esc(c.id) + '" aria-pressed="' + isL + '" aria-label="' + esc((isL ? "Unmark " : "Mark ") + c.name + " as learned") + '">' + CHECK + "</button>" +
+        '<div class="crow-name"><span class="nm">' + esc(c.name) + "</span>" + (c.core ? '<span class="chip star sm">★ Core</span>' : "") + "</div>" +
+      "</div>" +
+      '<div class="crow-desc"><p class="one">' + esc(c.one) + '</p><p class="when"><span class="label">Say it when</span> ' + esc(c.when) + "</p>" +
+        '<div class="more" id="more-' + esc(c.id) + '" hidden>' +
+          '<div><span class="label">How it works</span><p>' + esc(c.how) + "</p></div>" +
+          '<div><span class="label">Trade-off</span><p>' + esc(c.trade) + "</p></div>" +
         "</div>" +
       "</div>" +
-      '<aside class="aside">' +
-        '<div class="panel"><h3>Your progress</h3><p class="sub">Mark it once you can explain it out loud without notes.</p>' +
-          '<button type="button" class="learn-btn" id="learnBtn" aria-pressed="' + isL + '">' + (isL ? CHECK + "Learned" : "Mark as learned") + "</button></div>" +
-        '<div class="panel"><h3>Learn more</h3><p class="sub">Videos, articles and docs, opened in a new tab.</p>' +
-          (n.res.length ? '<div class="res-group">For this concept</div><ul class="res-list">' + resourceRows(n.res) + "</ul>" : "") +
-          '<div class="res-group">Search</div><ul class="res-list">' + resourceRows(searchLinks) + "</ul>" +
-          '<div class="res-group">Go deeper on ' + esc(domain.name) + '</div><ul class="res-list">' + resourceRows(domain.res) + "</ul>" +
-        "</div>" +
-      "</aside>" +
+      '<button type="button" class="expand" data-expand="' + esc(c.id) + '" aria-expanded="false" aria-controls="more-' + esc(c.id) + '" aria-label="Show how ' + esc(c.name) + ' works"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>' +
+    "</li>";
+  }).join("");
+
+  view.innerHTML =
+    '<article class="topic-page dom"' + domStyle(t) + ">" +
+      '<div class="level-head"><div><div class="eyebrow">' + esc(domain.name) + '</div><h1 class="level-title">' + esc(t.name) + "</h1>" +
+        '<p class="level-blurb">' + esc(t.blurb || "") + "</p></div>" +
+        '<div class="level-stats"><div class="stat"><b>' + items.length + '</b><span>Concepts</span></div><div class="stat"><b>' + items.filter(c => c.core).length + '</b><span>Core</span></div><div class="stat"><b id="topicDone">' + done + "</b><span>Learned</span></div></div>" +
+      "</div>" +
+      hero +
+      '<div class="clist-head"><span>Concept</span><span>What it means · when to bring it up</span><button type="button" class="expand-all" id="expandAll">Expand all</button></div>' +
+      '<ul class="clist">' + rows + "</ul>" +
+      '<div class="pager">' +
+        '<button type="button" class="prev" ' + (prevT ? 'data-go="' + esc(prevT.id) + '"' : "disabled") + '><span class="label">← Previous topic</span><span class="name">' + esc(prevT ? prevT.name : "Start of " + domain.name) + "</span></button>" +
+        '<button type="button" class="next" ' + (nextT ? 'data-go="' + esc(nextT.id) + '"' : "disabled") + '><span class="label">Next topic →</span><span class="name">' + esc(nextT ? nextT.name : "End of " + domain.name) + "</span></button>" +
+      "</div>" +
     "</article>";
 
-  $("learnBtn").addEventListener("click", () => {
-    if (learned.has(n.id)) learned.delete(n.id); else learned.add(n.id);
-    store.set("sda-learned-v1", Array.from(learned));
-    updateProgress();
-    const nowL = learned.has(n.id);
-    const b = $("learnBtn");
-    b.setAttribute("aria-pressed", String(nowL));
-    b.innerHTML = nowL ? CHECK + "Learned" : "Mark as learned";
-    const chips = view.querySelector(".detail-chips");
-    chips.innerHTML = (n.core ? '<span class="chip star">★ Core concept</span>' : '<span class="chip dom-chip">Good to know</span>') + (nowL ? '<span class="chip learned">' + CHECK + "Learned</span>" : "");
-    live.textContent = nowL ? n.name + " marked as learned" : n.name + " unmarked";
+  const setExpanded = (id, open) => {
+    const m = $("more-" + id), b = view.querySelector('[data-expand="' + CSS.escape(id) + '"]');
+    if (!m || !b) return;
+    m.hidden = !open; b.setAttribute("aria-expanded", String(open));
+    b.closest(".crow").classList.toggle("is-open", open);
+  };
+  view.querySelectorAll("[data-expand]").forEach(b => b.addEventListener("click", () => setExpanded(b.dataset.expand, b.getAttribute("aria-expanded") !== "true")));
+  view.querySelectorAll(".crow-desc").forEach(d => d.addEventListener("click", e => {
+    if (e.target.closest("a")) return;
+    const id = d.closest(".crow").dataset.id;
+    const b = view.querySelector('[data-expand="' + CSS.escape(id) + '"]');
+    setExpanded(id, b.getAttribute("aria-expanded") !== "true");
+  }));
+  $("expandAll").addEventListener("click", e => {
+    const open = e.currentTarget.textContent === "Expand all";
+    items.forEach(c => setExpanded(c.id, open));
+    e.currentTarget.textContent = open ? "Collapse all" : "Expand all";
   });
+  view.querySelectorAll("[data-learn]").forEach(b => b.addEventListener("click", () => {
+    const id = b.dataset.learn, c = byId.get(id);
+    if (learned.has(id)) learned.delete(id); else learned.add(id);
+    store.set("sda-learned-v1", Array.from(learned));
+    const on = learned.has(id);
+    b.setAttribute("aria-pressed", String(on));
+    b.setAttribute("aria-label", (on ? "Unmark " : "Mark ") + c.name + " as learned");
+    b.closest(".crow").classList.toggle("is-learned", on);
+    $("topicDone").textContent = items.filter(x => learned.has(x.id)).length;
+    updateProgress();
+    live.textContent = on ? c.name + " marked as learned" : c.name + " unmarked";
+  }));
+  focusConceptFn = (id, smooth) => {
+    const row = $("row-" + id); if (!row) return;
+    setExpanded(id, true);
+    row.classList.remove("flash"); void row.offsetWidth; row.classList.add("flash");
+    row.scrollIntoView({ block: "center", behavior: smooth && !reduceMotion ? "smooth" : "auto" });
+  };
+  if (focusId) setTimeout(() => focusConcept(focusId, false), 30);
 }
+let focusConceptFn = null;
+function focusConcept(id, smooth) { if (focusConceptFn) focusConceptFn(id, smooth); }
 
 /* ---------- Search palette ---------- */
 const pal = { wrap: $("paletteWrap"), input: $("paletteInput"), list: $("paletteList"), items: [], sel: 0, lastFocus: null };
@@ -1612,11 +1819,11 @@ function filterPalette() {
   const q = pal.input.value.trim().toLowerCase();
   let res;
   if (!q) {
-    res = searchIndex.filter(x => x.n.kind === "leaf" && x.n.core).slice(0, 12);
+    res = searchIndex.filter(x => x.n.kind === "concept" && x.n.core).slice(0, 12);
   } else {
     const toks = q.split(/\s+/);
     res = searchIndex.filter(x => toks.every(t => x.hay.includes(t)))
-      .map(x => ({ x, score: (x.name.startsWith(q) ? 0 : x.name.includes(q) ? 1 : 2) + (x.n.kind === "leaf" ? 0 : 0.5) }))
+      .map(x => ({ x, score: (x.name.startsWith(q) ? 0 : x.name.includes(q) ? 1 : 2) + (x.n.kind === "concept" ? 0 : 0.5) }))
       .sort((a, b) => a.score - b.score || a.x.n.name.localeCompare(b.x.n.name))
       .slice(0, 40).map(o => o.x);
   }
@@ -1628,7 +1835,7 @@ function filterPalette() {
   pal.list.innerHTML = (q ? "" : '<li class="res-group" role="presentation">Core concepts</li>') + res.map((x, i) =>
     '<li class="p-item dom" role="option" id="opt-' + i + '" data-k="' + i + '" aria-selected="' + (i === 0) + '"' + domStyle(x.n) + '>' +
     '<span class="p-dot" aria-hidden="true"></span><span style="min-width:0"><span class="p-name">' + (x.n.core ? "★ " : "") + esc(x.n.name) + '</span><span class="p-path">' + esc(x.path || "Domain") + "</span></span>" +
-    '<span class="p-kind">' + (x.n.kind === "leaf" ? "Concept" : x.n.kind === "group" ? "Group" : "Domain") + "</span></li>").join("");
+    '<span class="p-kind">' + (x.n.kind === "concept" ? "Concept" : x.n.kind === "topic" ? "Topic" : "Domain") + "</span></li>").join("");
   pal.input.setAttribute("aria-activedescendant", "opt-0");
 }
 function movePalette(d) {
@@ -1660,13 +1867,13 @@ function setCore(v) {
   activeIdx.clear();
   const node = byId.get(currentId) || root;
   renderCrumbs(node);
-  if (isLeaf(node)) renderDetail(node); else renderTray(node);
+  if (isLeaf(node)) renderTopic(pageNode(node), null); else renderTray(node);
 }
 $("segAll").addEventListener("click", () => setCore(false));
 $("segCore").addEventListener("click", () => setCore(true));
 $("brand").addEventListener("click", () => go("atlas"));
 $("searchBtn").addEventListener("click", openPalette);
-backBtn.addEventListener("click", () => { const n = byId.get(currentId); if (n && n.parent) go(n.parent.id); });
+backBtn.addEventListener("click", () => { const n = byId.get(currentId); const t = n && backTarget(n); if (t) go(t.id); });
 document.addEventListener("click", e => {
   const g = e.target.closest("[data-go]");
   if (g && !g.disabled && !g.matches('[aria-current="page"]')) go(g.dataset.go);
@@ -1677,7 +1884,7 @@ document.addEventListener("keydown", e => {
   if (!pal.wrap.hidden || typing) return;
   if (e.key === "/") { e.preventDefault(); openPalette(); return; }
   const n = byId.get(currentId);
-  if (e.key === "Escape" || e.key === "Backspace") { if (n && n.parent) { e.preventDefault(); go(n.parent.id); } return; }
+  if (e.key === "Escape" || e.key === "Backspace") { const t = n && backTarget(n); if (t) { e.preventDefault(); go(t.id); } return; }
   if (ringState && !isLeaf(n)) {
     if (["ArrowRight", "ArrowLeft", "Home", "End"].includes(e.key)) touch();
     if (e.key === "ArrowRight") { e.preventDefault(); setActive(ringState.active + 1, true); }
